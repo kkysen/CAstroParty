@@ -4,13 +4,21 @@
 #define WINDOW_HEIGHT 480
 #define GAME_TITLE "C-raft"
 
+#define GAME_FPS 60
 
 // TODO: Move headers to a header file and figure out how to import those
 void init_sdl();
 void quit_sdl();
 
+// Main loop functions
+void main_loop();
+void main_tick();
+void main_render();
+
 SDL_Window *window;
 SDL_Renderer *renderer;
+
+int game_running = 0;
 
 /* init_sdl
  *
@@ -60,11 +68,53 @@ void quit_sdl() {
     SDL_Quit();
 }
 
+void main_tick() {
+    printf("Tick\n");
+}
+
+void main_render() {
+    printf("Render\n");
+}
+
+void main_loop() {
+    game_running = 1;
+    unsigned int prev_time = SDL_GetTicks();
+    unsigned int delta_time;
+
+    int should_render = 0;
+
+    unsigned int ms_per_frame = 1000 * GAME_FPS;
+    while(game_running) {
+        should_render = 0;
+
+        delta_time = SDL_GetTicks() - prev_time;
+        while(delta_time > ms_per_frame) {
+            delta_time -= ms_per_frame;
+            should_render = 1;
+
+            main_tick();
+
+            prev_time = SDL_GetTicks();
+        }
+
+        if (should_render) {
+            main_render();
+        }
+
+    }
+}
+
 int main() {
 
-    init_sdl();
+    //init_sdl();
 
-    SDL_RenderClear(renderer);
+    main_loop();
+
+    //quit_sdl();
+
+    return 0;
+
+    /*SDL_RenderClear(renderer);
 
     SDL_SetRenderDrawColor(
             renderer,
@@ -80,9 +130,6 @@ int main() {
     SDL_RenderPresent(renderer);
 
     SDL_Delay(1500);
-
-    quit_sdl();
-
-    return 0;
+    */
 }
 
