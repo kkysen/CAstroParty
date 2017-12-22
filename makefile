@@ -26,6 +26,9 @@ $(BIN_DIR)/%.o: $(SRC_DIR)/%.c
 bindirexists:
 	mkdir -p $(BIN_DIR)
 
+run: all
+	./$(PROGRAM_NAME)
+
 clean:
 	rm -f $(PROGRAM_NAME)
 	rm -rf $(BIN_DIR)
