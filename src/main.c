@@ -2,16 +2,29 @@
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
+#define GAME_TITLE "C-raft"
 
-int main() {
 
+// TODO: Move headers to a header file and figure out how to import those
+void init_sdl();
+void quit_sdl();
+
+SDL_Window *window;
+SDL_Renderer *renderer;
+
+/* init_sdl
+ *
+ * Initializes our sdl components
+ *
+ */
+void init_sdl() {
     if (SDL_Init( SDL_INIT_EVERYTHING ) != 0) {
         printf("SDL Init failed! You're kinda screwed now\n");
         exit(1);
     }
 
-    SDL_Window *window = SDL_CreateWindow(
-            "Hoi walrd!", 
+    window = SDL_CreateWindow(
+            GAME_TITLE, 
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
             WINDOW_WIDTH,
@@ -23,40 +36,52 @@ int main() {
         exit(1);
     }
 
-    SDL_Renderer *render = SDL_CreateRenderer(
+    renderer = SDL_CreateRenderer(
             window, 
             -1, 
             SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
             );
-    if (render == NULL) {
+    if (renderer == NULL) {
         SDL_DestroyWindow(window);
         printf("SDL Renderer failed to create. Good luck working with an empty window\n");
         SDL_Quit();
         exit(1);
     }
+}
 
-    SDL_RenderClear(render);
+/* quit_sdl
+ *
+ * De-initializes and discards our sdl components
+ *
+ */
+void quit_sdl() {
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
 
-    /*TODO: This breaks everytang SDL_SetRenderDrawColor(
-            render,
+int main() {
+
+    init_sdl();
+
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(
+            renderer,
             255,
             0,
             255,
             255);
-    */
 
     SDL_Rect rect = {.x = 10, .y = 10, .w = 100, .h = 100};
 
-    SDL_RenderDrawRect(render, &rect);
-    
-    SDL_RenderPresent(render);
+    SDL_RenderDrawRect(renderer, &rect);
+
+    SDL_RenderPresent(renderer);
 
     SDL_Delay(1500);
 
-
-    SDL_DestroyRenderer(render);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    quit_sdl();
 
     return 0;
 }
