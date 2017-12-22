@@ -29,7 +29,7 @@ void init_sdl() {
             SDL_WINDOWPOS_CENTERED,
             WINDOW_WIDTH,
             WINDOW_HEIGHT,
-            0//SDL_WINDOW_BORDERLESS//0 //SDL_WINDOW_INPUT_GRABBED
+            SDL_WINDOW_OPENGL//SDL_WINDOW_BORDERLESS//0 //SDL_WINDOW_INPUT_GRABBED
             );
     if (window == NULL) {
         printf("SDL Window failed to create. Have fun\n");
@@ -70,13 +70,13 @@ int main() {
             renderer,
             255,
             0,
-            255,
+            0,
             255);
-
+    
     SDL_Rect rect = {.x = 10, .y = 10, .w = 100, .h = 100};
 
     SDL_RenderDrawRect(renderer, &rect);
-
+    
     SDL_RenderPresent(renderer);
 
     SDL_Delay(1500);
