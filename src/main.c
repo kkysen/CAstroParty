@@ -2,9 +2,11 @@
 
 #include<math.h>
 
+#include "player.h"
+
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
-#define GAME_TITLE "C-raft"
+#define GAME_TITLE "C-astro"
 
 #define GAME_FPS 60
 
@@ -38,7 +40,7 @@ void init_sdl() {
     }
 
     window = SDL_CreateWindow(
-            GAME_TITLE, 
+            GAME_TITLE,
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
             WINDOW_WIDTH,
@@ -51,8 +53,8 @@ void init_sdl() {
     }
 
     renderer = SDL_CreateRenderer(
-            window, 
-            -1, 
+            window,
+            -1,
             SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
             );
     if (renderer == NULL) {
@@ -95,11 +97,11 @@ void main_render() {
             0,
             0,
             255);
-    
+
     SDL_Rect rect = {.x = 100 + 20*cos(temp_var_theta), .y = 100 + 20*sin(temp_var_theta), .w = 100, .h = 100};
 
     SDL_RenderDrawRect(renderer, &rect);
- 
+
     SDL_RenderPresent(renderer);
 
 }
@@ -119,9 +121,9 @@ void main_loop() {
 
     while(game_running) {
         should_render = 0;
-        
+
         now_time = SDL_GetTicks();
-        
+
         delta_time = now_time - prev_time;
         while(delta_time > ms_per_frame) {
             delta_time -= ms_per_frame;
@@ -162,11 +164,11 @@ int main() {
             0,
             0,
             255);
-    
+
     SDL_Rect rect = {.x = 10, .y = 10, .w = 100, .h = 100};
 
     SDL_RenderDrawRect(renderer, &rect);
-    
+
     SDL_RenderPresent(renderer);
 
     SDL_Delay(1500);
