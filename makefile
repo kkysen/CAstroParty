@@ -6,7 +6,7 @@ BIN_DIR=bin
 
 PROGRAM_NAME=game.out
 
-CFLAGS=-lSDL2 -lSDL2main
+CFLAGS=-lSDL2 -lSDL2main -lm
 
 SRCS=$(wildcard $(SRC_DIR)/*.c)
 
