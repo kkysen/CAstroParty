@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 
+#include<math.h>
+
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
 #define GAME_TITLE "C-raft"
@@ -19,6 +21,10 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 
 int game_running = 0;
+
+// Testing purposes
+double temp_var_theta = 0;
+
 
 /* init_sdl
  *
@@ -69,36 +75,70 @@ void quit_sdl() {
 }
 
 void main_tick() {
-    printf("Tick\n");
+    temp_var_theta += 0.1;
+
 }
 
 void main_render() {
-    printf("Render\n");
+    SDL_SetRenderDrawColor(
+            renderer,
+            0,
+            0,
+            0,
+            255);
+    SDL_RenderClear(renderer);
+
+    // Actual drawing happens here
+    SDL_SetRenderDrawColor(
+            renderer,
+            255,
+            0,
+            0,
+            255);
+    
+    SDL_Rect rect = {.x = 100 + 20*cos(temp_var_theta), .y = 100 + 20*sin(temp_var_theta), .w = 100, .h = 100};
+
+    SDL_RenderDrawRect(renderer, &rect);
+ 
+    SDL_RenderPresent(renderer);
+
 }
 
 void main_loop() {
     game_running = 1;
+
+    unsigned int now_time;
     unsigned int prev_time = SDL_GetTicks();
     unsigned int delta_time;
 
     int should_render = 0;
 
-    unsigned int ms_per_frame = 1000 * GAME_FPS;
+    unsigned int ms_per_frame = 1000 / GAME_FPS;
+
+    int tick_count = 0;
+
     while(game_running) {
         should_render = 0;
-
-        delta_time = SDL_GetTicks() - prev_time;
+        
+        now_time = SDL_GetTicks();
+        
+        delta_time = now_time - prev_time;
         while(delta_time > ms_per_frame) {
             delta_time -= ms_per_frame;
             should_render = 1;
 
             main_tick();
+            tick_count++;
 
-            prev_time = SDL_GetTicks();
+            prev_time = now_time;
         }
 
         if (should_render) {
             main_render();
+        }
+        if (tick_count > 60 * 4) {
+            quit_sdl();
+            exit(0);
         }
 
     }
@@ -106,11 +146,11 @@ void main_loop() {
 
 int main() {
 
-    //init_sdl();
+    init_sdl();
 
     main_loop();
 
-    //quit_sdl();
+    quit_sdl();
 
     return 0;
 
