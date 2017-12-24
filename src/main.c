@@ -6,7 +6,7 @@
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
-#define GAME_TITLE "C-astro"
+#define GAME_TITLE "C-astro Party"
 
 #define GAME_FPS 60
 
@@ -23,6 +23,8 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 
 int game_running = 0;
+
+Player* players[4];
 
 // Testing purposes
 double temp_var_theta = 0;
