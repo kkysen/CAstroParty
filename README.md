@@ -1,2 +1,2 @@
-# CMinecraft
-Minecraft written in C
+# CAstroParty
+A remote, multiplayer Astro Party game written in C
