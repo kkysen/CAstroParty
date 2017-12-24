@@ -21,7 +21,7 @@ Vector Vector_scale(Vector vector, float scalar){
 }
 
 Vector Vector_normalize(Vector vector){
-	return scale(vector, 1/magnitude(vector));
+	return Vector_scale(vector, 1/Vector_magnitude(vector));
 }
 
 Vector Vector_add(Vector vector1, Vector vector2){

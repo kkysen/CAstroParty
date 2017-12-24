@@ -15,8 +15,8 @@
 struct player{
 	char name[NAME_LENGTH];
 	char* color;
-	struct vector pos;
-	struct vector velocity;
+	Vector pos;
+	Vector velocity;
 	float orientation;
 	char ammo;
 } typedef Player;
@@ -49,11 +49,11 @@ char* Player_get_color(Player* player){
 	return player->color;
 }
 
-struct vector Player_get_pos(Player* player){
+Vector Player_get_pos(Player* player){
 	return player->pos;
 }
 
-struct vector Player_get_velocity(Player* player){
+Vector Player_get_velocity(Player* player){
 	return player->velocity;
 }
 
@@ -61,8 +61,8 @@ float Player_get_orientation(Player* player){
 	return player->orientation;
 }
 
-struct vector Player_get_acceleration(Player* player){
-	return new_vector(ACCELERATION * cos(orientation*M_PI/180), ACCELERATION * sin(orientation*M_PI/180));
+Vector Player_get_acceleration(Player* player){
+	return Vector_new(ACCELERATION * cos(player->orientation*M_PI/180), ACCELERATION * sin(player->orientation*M_PI/180));
 }
 
 char Player_get_ammo(Player* player){
@@ -80,11 +80,11 @@ void Player_set_color(Player* player, char* color){
 	player->color = color;
 }
 
-void Player_set_pos(Player* player, struct vector pos){
+void Player_set_pos(Player* player, Vector pos){
 	player->pos = pos;
 }
 
-void Player_set_velocity(Player* player, struct vector velocity){
+void Player_set_velocity(Player* player, Vector velocity){
 	player->velocity = velocity;
 }
 
@@ -101,12 +101,11 @@ void Player_set_ammo(Player* player, char ammo){
 //actions
 
 void Player_update(Player* player){
-	struct vector acceleration = get_acceleration(player);
-	struct vector velocity = get_velocity(player);
-	struct vector new_velocity = scale(vector_add(velocity, acceleration), 2.0/3.0);
-	set_pos(player, new_pos);
-	struct vector new_pos = vector_add(get_pos(player), get_velocity(player));
-	set_pos(player, new_pos);
+	Vector acceleration = Player_get_acceleration(player);
+	Vector velocity = Player_get_velocity(player);
+	Vector new_velocity = Vector_scale(Vector_add(velocity, acceleration), 2.0/3.0);
+	Vector new_pos = Vector_add(Player_get_pos(player), new_velocity);
+	Player_set_pos(player, new_pos);
 }
 
 #endif
