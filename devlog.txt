@@ -30,6 +30,7 @@ Rewrote most of the main.c code in game.h using a Game struct that contains all 
         in seconds, using SDL_GetPerformanceFrequency().
         This delta_time is used to call Game_update(),
         and then Game_render() is called.
+        (V-Sync takes care of ensuring that FPS doesn't go higher than necessary).
         Game.prev_time is always updated, even if Game.is_running is false.
     Game_update() updates the entire tree of game objects according to a delta_time.
         Right now, the tree of game objects only consists of the players in Game.players,
