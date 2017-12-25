@@ -1,0 +1,47 @@
+
+
+khyberS -- 2017-12-25 04:00:55
+Added a bunch of my utility code from past projects under src/util/.
+    string_utils.h contains a bunch of useful string functions.
+    stacktrace.h can set a signal handler that prints a stacktrace on any signal, including SIGSEGV.
+    utils.h has a bunch of useful error message and debug macros.
+    The other files have some other things that might be useful later.
+Added sdl_utils.h, which contains useful error message and debug macros for SDL errors.
+Added sdl_colors.h, which has named color constants.
+Fixed some of the code in vector.h and wrote as much of it with macros,
+    so that the vector doesn't have to be copied on each function call.
+    The ones that I couldn't macro-ize, I inlined.
+Rewrote most of the main.c code in game.h using a Game struct that contains all the data for a single game.
+    Game_init() is a pseudo-constructor that initializes the SDL stuff and allocates memory for other fields,
+        and it handles errors well, propagating -1 returns and printout out error messages and line numbers.
+    Game_quit() destroys and frees all the SDL and other allocated memory,
+        and sets all the fields to 0 or NULL or the appropriate base value.
+    Game_add_player() just adds a new players to the game through the Players *players field (see below).
+    Game_run() starts and runs the core game loop.
+        On every frame, it checks to see if Game.interrupt, a function pointer, has been set.
+        If it has, then it is called.
+        This allows another thread to interrupt the game in anyway it desires,
+        such as setting Game.is_running = false to pause the game
+        or setting Game.quit = true to quit the game.
+        It always calls Game_loop().
+    Game_loop() runs the each core game loop.
+        It fetches the current time/tick using SDL_GetPerformanceCounter()
+        and computes the delta_time compared to the Game.prev_time
+        in seconds, using SDL_GetPerformanceFrequency().
+        This delta_time is used to call Game_update(),
+        and then Game_render() is called.
+        Game.prev_time is always updated, even if Game.is_running is false.
+    Game_update() updates the entire tree of game objects according to a delta_time.
+        Right now, the tree of game objects only consists of the players in Game.players,
+        but it will later include everything else as well, such as bullets and obstacles.
+    Game_render() renders every game object given an SDL_Renderer.
+        This is called after Game_update() has been called for each game object.
+        Before calling rendering the game objects, Game_renders() clears the screen with black,
+        and after rendering the game objects, it calls SDL_RenderPresent() to actually render everything.
+Wrote the Players struct in players.h.
+    Players keeps track of a dynamic array of players, with a maximum number of players set (a uint8_t).
+    It has functions to add players (Players_add()),
+    update them (Players_update()), and render them (Players_render()).
+    The latter two just call Player_update() and Player_render(), respectively, on each Player in the array.
+Created mostly empty files for Bullet, Obstacle, Bullets, and Obstacles,
+    which will have a similar relationship as Player and Players.

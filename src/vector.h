@@ -1,31 +1,47 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef CASTROPARTY_VECTOR_H
+#define CASTROPARTY_VECTOR_H
 
 #include <math.h>
 
-struct vector{
-	float x;
-	float y;
-} typedef Vector;
+typedef struct {
+    float x;
+    float y;
+} Vector;
 
-Vector Vector_new(float x, float y){
-	return (Vector){.x = x, .y = y};
+#define deg2rad(degrees) ((degrees) * (float) M_PI / 180)
+
+#define rad2deg(radians) ((radians) * 180 / (float) M_PI)
+
+#define Vector_new(_x, _y) (Vector) {.x = (_x), .y = (_y)}
+
+#define Vector_norm2(vector) ((vector).x * (vector).x + (vector).y * (vector).y)
+
+#define Vector_magnitude2(vector) Vector_norm2(vector)
+
+#define Vector_norm(vector) sqrtf(Vector_norm2(vector))
+
+#define Vector_magnitude(vector) Vector_norm(vector)
+
+#define Vector_i_scale(vector, scalar) { \
+    const float _scalar = scalar; \
+    (vector).x *= _scalar; \
+    (vector).y *= _scalar; \
 }
 
-float Vector_magnitude(Vector vector){
-	return (float)sqrt(pow(vector.x, 2) + pow(vector.y, 2));
-}
+inline Vector Vector_scale(Vector vector, float scalar);
 
-Vector Vector_scale(Vector vector, float scalar){
-	return (Vector){.x = vector.x * scalar, .y = vector.y * scalar};
-}
+#define Vector_i_normalize(vector) Vector_i_scale(vector, 1 / Vector_norm(vector))
 
-Vector Vector_normalize(Vector vector){
-	return Vector_scale(vector, 1/Vector_magnitude(vector));
-}
+inline Vector Vector_normalize(Vector vector);
 
-Vector Vector_add(Vector vector1, Vector vector2){
-	return (Vector){.x = vector1.x + vector2.x, .y = vector1.y + vector2.y};
-}
+#define Vector_i_add(vector1, vector2) {(vector1).x += (vector2).x; (vector1).y += (vector2).y;}
 
-#endif
+inline Vector Vector_add(Vector vector1, Vector vector2);
+
+inline float Vector_dist2(Vector vector1, Vector vector2);
+
+#define Vector_dist(vector1, vector2) sqrtf(Vector_dist2(vector1, vector2))
+
+#define Vector_in_radius(vector1, vector2, radius) Vector_dist(vector1, vector2) < (radius) * (radius)
+
+#endif // CASTROPARTY_VECTOR_H

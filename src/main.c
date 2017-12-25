@@ -6,7 +6,7 @@
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
-#define GAME_TITLE "C-astro Party"
+#define GAME_TITLE "C-Astro Party"
 
 #define GAME_FPS 60
 
