@@ -1,0 +1,35 @@
+Adris Jautakas, Jawadul Kadir, and Khyber Sen
+
+CAstro Party - This project intends to be a recreation of the popular mobile game
+Astro Party written in C, using SDL 2.0. The project will feature multiplayer
+gameplay and lobby hosting for multiple games at once with up to four players per
+lobby.
+
+The user will interact with the program through the GUI provided by SDL and using
+keyboard buttons to move the character in the game.
+
+Topics covered in class used:
+Allocating memory for dynamic structures in the game, such as players and bullets.
+Forking from main server into multiple lobbies and from lobbies to helper processes
+that deal with networking and receiving input.
+Signals to regulate interactions between all the processes.
+Using pipes to communicate between the main server and lobbies
+Using shared memory to keep track of inputs, which is written by the networking
+process and read by the game process.
+Networking to allow for remote multiplayer
+
+Project Roles:
+Adris: SDL
+Jawadul: Server and lobby interactions
+Khyber: Networking
+
+Data Structures:
+Custom unions and structs for management of in-game objects
+Queue for cycling through players and asteroids
+
+Algorithms:
+Game loop and rendering algorithms that runs and renders the game on the client
+once every sixtieth of a second
+Serialization for sending data over network.
+
+Timeline:
