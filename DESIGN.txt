@@ -1,0 +1,55 @@
+CAstro Party
+
+Adris Jautakas, Jawadul Kadir, and Khyber Sen
+
+This project intends to be a recreation of the popular mobile game
+Astro Party written in C using SDL 2.0. The project will feature multiplayer
+gameplay and lobby hosting for multiple games at once with up to four players per
+lobby.
+
+In CAstro Party, four small spaceships will fly around in a rectangular screen set in space.
+The player will be able to control the spaceship with two keys,
+one to accelerate forward to a maximum speed,
+and the other to turn right.
+As the spaceship flies around the screen, the user's goal will be to kill the other player's spaceships
+by shooting them, which the user can do by pressing another key.
+There will also be obstacles in the way, which can be destroyed when the spaceships shoot them.
+There may also be special power-ups that allow a spaceship to shoot a powerful laser instead of small bullets.
+
+The user will interact with the program through the GUI provided by SDL and using
+keyboard buttons (mainly arrows or ASWD) to move the character in the game.
+
+Topics Covered in Class Used:
+Allocating memory for dynamic structures in the game, such as players and bullets.
+Forking from main server into multiple lobbies and from lobbies to helper processes/threads
+that deal with networking and receiving input.
+Signals to regulate interactions between all the processes and to respond to user termination.
+Using pipes to communicate between the main server and lobbies.
+Using shared memory to keep track of inputs,
+which is written by the networking process and read by the game process.
+Networking to allow for remote multiplayer.
+
+Project Roles:
+Adris: SDL
+Jawadul: Server and Lobby Interactions
+Khyber: Networking and Game Loop
+
+Data Structures:
+Custom unions and structs for management of in-game objects
+Queues for handling user input and updates sent over the network.
+ArrayList/Vectors for the lists of players, bullets, obstacles, and other game objects.
+A complex object graph of all the game objects that will be traversed at each frame
+to update, render, and serialize all the necessary data
+for the server to send to clients and the clients to send to the server.
+A caching Map<enum, Sprite> struct that lazily loads and caches Sprites and the Textures stored in them.
+
+Algorithms:
+A game loop that runs at 60 FPS and updates and renders all game objects each frame.
+    This game loop will update only on the server,
+    while updating and rendering on the client.
+    Only validated user input changes will be sent across the network to minimize network latency.
+Hashing of the entire game object tree for the server to validate the client game state
+    to ensure that no illegal moves were made.
+Serialization of all necessary game objects to send them over the network.
+
+Timeline:

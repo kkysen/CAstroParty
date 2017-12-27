@@ -80,3 +80,6 @@ Created a lazy, caching mechanism for loading SDL_Textures and their correspondi
         such that each GameTexture corresponds to a texture file in src/textures/,
         which is loaded into the Sprite[].
 
+khyberS -- 2017-12-26 20:51:11
+Updated DESIGN.txt with a better explanation of the game and more data structures and algorithms.
+

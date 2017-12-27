@@ -40,6 +40,12 @@ Vector Vector_normalize(Vector vector);
 
 #define Vector_i_add(vector1, vector2) {(vector1).x += (vector2).x; (vector1).y += (vector2).y;}
 
+#define Vector_i_mul_add(vector1, vector2, scalar) \
+{ \
+    (vector1).x += (vector2).x * (scalar); \
+    (vector1).y += (vector2).y * (scalar); \
+}
+
 Vector Vector_add(Vector vector1, Vector vector2);
 
 float Vector_dist2(Vector vector1, Vector vector2);

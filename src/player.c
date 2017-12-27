@@ -48,9 +48,9 @@ bool Player_in_radius(const Player *const player, Vector position, const float r
 void Player_update(Player *const player, const float delta_time) {
     // TODO incorporate delta_time
     const Vector acceleration = Player_get_acceleration(player);
-    Vector_i_add(player->velocity, acceleration);
+    Vector_i_mul_add(player->velocity, acceleration, delta_time);
     Vector_i_scale(player->velocity, MAX_SPEED_FACTOR);
-    Vector_i_add(player->position, player->velocity);
+    Vector_i_mul_add(player->position, player->velocity, delta_time);
 }
 
 void Player_render(const Player *const player, SDL_Renderer *const renderer) {
