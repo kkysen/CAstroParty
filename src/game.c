@@ -7,10 +7,20 @@
 #include "util/sdl_colors.h"
 #include "util/sdl_utils.h"
 #include "util/string_utils.h"
+#include "util/hash.h"
+#include "player.h"
+#include "textures.h"
+
+Game *Game_new() {
+    Game *const game = (Game *) malloc(sizeof(Game));
+    Game_init(game, GAME_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, GAME_FPS, GAME_DEFAULT_NUM_PLAYERS);
+    return game;
+}
 
 static int Game_init_renderer(Game *const game) {
     game->renderer = SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    sdl_check_null_perror_msg(game->renderer, "SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)");
+    sdl_check_null_perror_msg(game->renderer,
+                              "SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)");
     return 0;
 }
 
@@ -23,7 +33,9 @@ static int Game_init_window(Game *const game) {
             game->height,
             SDL_WINDOW_OPENGL
     );
-    sdl_check_null_perror_msg(game->window, "SDL_CreateWindow( game->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, game->width, game->height, SDL_WINDOW_OPENGL)");
+    sdl_check_null_perror_msg(game->window,
+                              "SDL_CreateWindow( game->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, game->width, game->height, SDL_WINDOW_OPENGL)");
+    
     return 0;
 }
 
@@ -58,17 +70,19 @@ int Game_init(Game *const game, const char *const title,
     game->players = players;
     
     sdl_check_perror(SDL_Init(SDL_INIT_EVERYTHING));
+    
     if (Game_init_window_and_renderer(game) == -1) {
+        sdl_perror("Game_init_window_and_renderer(game)");
         SDL_Quit();
         free(game->players);
-        sdl_perror("Game_init_window_and_renderer(game)");
         return -1;
     }
     
     return 0;
 }
 
-void Game_quit(Game *const game) {
+// TODO must also signal to other games on network
+void Game_destroy(Game *game) {
     Players_free(game->players);
     free(game->players);
     game->players = NULL;
@@ -97,6 +111,7 @@ void Game_quit(Game *const game) {
 
 int Game_add_player(const Game *const game, Player *const player) {
     check_perror(Players_add(game->players, player));
+    player->sprite = *get_sprite(player->sprite.id, game->renderer);
     return 0;
 }
 
@@ -111,7 +126,7 @@ void Game_run(Game *const game) {
             game->interrupt(game);
         }
         if (game->quit) {
-            Game_quit(game);
+            Game_destroy(game);
             return;
         }
         Game_loop(game);
@@ -141,4 +156,39 @@ void Game_render(const Game *const game) {
     Players_render(game->players, game->renderer);
     
     SDL_RenderPresent(game->renderer);
+}
+
+#define _hash(val) hash(current_hash, (double) (val))
+
+uint64_t Game_hash(const Game *const game) {
+    uint64_t current_hash = PRIME_64;
+    _hash(game->is_running);
+    _hash(game->fps);
+    _hash(game->width);
+    _hash(game->height);
+    _hash(fnv1a_64_hash(game->title));
+    _hash(Players_hash(game->players));
+    return current_hash;
+}
+
+#undef _hash
+
+static void _GameInterruptor_pause(Game *const game) {
+    game->is_running = false;
+}
+
+const GameInterruptor GameInterruptor_pause = _GameInterruptor_pause;
+
+void Game_pause(Game *const game) {
+    game->interrupt = GameInterruptor_pause;
+}
+
+static void _GameInterruptor_quit(Game *const game) {
+    game->quit = true;
+}
+
+const GameInterruptor GameInterruptor_quit = _GameInterruptor_quit;
+
+void Game_quit(Game *const game) {
+    game->interrupt = GameInterruptor_quit;
 }

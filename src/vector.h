@@ -2,10 +2,14 @@
 #define CASTROPARTY_VECTOR_H
 
 #include <math.h>
+#include <stdint.h>
 
-typedef struct {
-    float x;
-    float y;
+typedef union {
+    struct {
+        float x;
+        float y;
+    };
+    uint64_t bits;
 } Vector;
 
 #define deg2rad(degrees) ((degrees) * (float) M_PI / 180)
@@ -28,17 +32,17 @@ typedef struct {
     (vector).y *= _scalar; \
 }
 
-inline Vector Vector_scale(Vector vector, float scalar);
+Vector Vector_scale(Vector vector, float scalar);
 
 #define Vector_i_normalize(vector) Vector_i_scale(vector, 1 / Vector_norm(vector))
 
-inline Vector Vector_normalize(Vector vector);
+Vector Vector_normalize(Vector vector);
 
 #define Vector_i_add(vector1, vector2) {(vector1).x += (vector2).x; (vector1).y += (vector2).y;}
 
-inline Vector Vector_add(Vector vector1, Vector vector2);
+Vector Vector_add(Vector vector1, Vector vector2);
 
-inline float Vector_dist2(Vector vector1, Vector vector2);
+float Vector_dist2(Vector vector1, Vector vector2);
 
 #define Vector_dist(vector1, vector2) sqrtf(Vector_dist2(vector1, vector2))
 

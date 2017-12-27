@@ -59,3 +59,18 @@ int verify_sha256(const int fd, const void *const bytes, const size_t size, cons
     
     return 0;
 }
+
+inline uint64_t fp_hash(const uint64_t hash, const double val) {
+    LongDouble u = {.d = val};
+    u.d *= hash;
+    return hash * u.i;
+}
+
+uint64_t fnv1a_64_hash(const char *s) {
+    uint64_t hash = FNV1A_64_OFFSET_BASIS;
+    char c;
+    while ((c = *s++)) {
+        hash = hash * FNV1A_64_PRIME ^ c;
+    }
+    return hash;
+}

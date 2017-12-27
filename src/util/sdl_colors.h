@@ -36,4 +36,6 @@ extern_rgb(NAVY);
 
 #undef extern_rgb
 
+uint32_t SDL_Color_bits(SDL_Color color);
+
 #endif //CASTROPARTY_SDL_COLORS_H

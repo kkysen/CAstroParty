@@ -33,6 +33,18 @@ set(SOURCE_FILES
         src/util/string_utils.h
         src/util/utils.c
         src/util/utils.h
-        src/players.c src/players.h src/bullet.c src/bullet.h src/bullets.c src/bullets.h src/obstacle.c src/obstacle.h src/obstacles.c src/obstacles.h)
+        src/players.c
+        src/players.h
+        src/bullet.c
+        src/bullet.h
+        src/bullets.c
+        src/bullets.h
+        src/obstacle.c
+        src/obstacle.h
+        src/obstacles.c
+        src/obstacles.h
+        src/textures.c
+        src/textures.h
+        )
 
 add_executable(CAstroParty ${SOURCE_FILES})

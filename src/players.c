@@ -5,6 +5,8 @@
 #include "players.h"
 
 #include "util/utils.h"
+#include "util/hash.h"
+#include "player.h"
 
 void Players_free(Players *const players) {
     free(players->players);
@@ -46,9 +48,19 @@ void Players_update(Players *const players, const float delta_time) {
 }
 
 void Players_render(const Players *const players, SDL_Renderer *const renderer) {
-    const uint_fast8_t num_players = players->num_players; \
-    const Player *const players_array = players->players; \
-    for (uint_fast8_t i = 0; i < num_players; ++i) { \
+    const uint_fast8_t num_players = players->num_players;
+    const Player *const players_array = players->players;
+    for (uint_fast8_t i = 0; i < num_players; ++i) {
         Player_render(players_array + i, renderer);
     }
+}
+
+uint64_t Players_hash(const Players *const players) {
+    uint64_t hash = PRIME_64;
+    const uint_fast8_t num_players = players->num_players;
+    const Player *const players_array = players->players;
+    for (uint_fast8_t i = 0; i < num_players; ++i) {
+        hash = hash(hash, Player_hash(players_array + i));
+    }
+    return hash;
 }

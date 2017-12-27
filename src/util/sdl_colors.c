@@ -26,4 +26,8 @@ def_rgb(OLIVE, 128, 128, 0);
 def_rgb(PURPLE, 128, 0, 128);
 def_rgb(TEAL, 0, 128, 128);
 
+uint32_t SDL_Color_bits(const SDL_Color color) {
+    return (color.r << 0) & (color.g << 8) & (color.b << 16) & (color.a << 24);
+}
+
 #undef def_rgb

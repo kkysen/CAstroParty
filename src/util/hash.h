@@ -22,4 +22,26 @@ int send_sha256(int fd, const void *bytes, size_t size);
 
 int verify_sha256(int fd, const void *bytes, size_t size, const char *file_type);
 
+typedef union {
+    double d;
+    uint64_t i;
+} LongDouble;
+
+uint64_t fp_hash(uint64_t hash, double val);
+
+#define hash(h, val) fp_hash(h, (double) (val))
+
+#define FNV1A_64_OFFSET_BASIS 14695981039346656037
+#define FNV1A_64_PRIME 1099511628211
+
+#define PRIME_64 FNV1A_64_PRIME
+
+/**
+ * Compute the 64-bit FNV 1-a hash of a string.
+ *
+ * @param [in] s the string to hash
+ * @return the 64-bit FNV 1-a hash of the string
+ */
+uint64_t fnv1a_64_hash(const char *s);
+
 #endif //SYSTEMS_HASH_H

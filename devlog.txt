@@ -14,7 +14,7 @@ Fixed some of the code in vector.h and wrote as much of it with macros,
 Rewrote most of the main.c code in game.h using a Game struct that contains all the data for a single game.
     Game_init() is a pseudo-constructor that initializes the SDL stuff and allocates memory for other fields,
         and it handles errors well, propagating -1 returns and printout out error messages and line numbers.
-    Game_quit() destroys and frees all the SDL and other allocated memory,
+    Game_destroy() destroys and frees all the SDL and other allocated memory,
         and sets all the fields to 0 or NULL or the appropriate base value.
     Game_add_player() just adds a new players to the game through the Players *players field (see below).
     Game_run() starts and runs the core game loop.
@@ -46,3 +46,37 @@ Wrote the Players struct in players.h.
     The latter two just call Player_update() and Player_render(), respectively, on each Player in the array.
 Created mostly empty files for Bullet, Obstacle, Bullets, and Obstacles,
     which will have a similar relationship as Player and Players.
+
+khyberS -- 2017-12-26 16:22:23
+Added a Game_hash() method that hashes all the game objects and other fields.
+    This can be used to communicate between server and client and
+    ensure that both game simulations are accurate, i.e. they have the same hash.
+    By using a hash, everything doesn't have to be compared, just a long sent over network to verify.
+    A client could potentially try to do something illegal, and this will allow the server to verify
+    that the server and client game simulations are synced.
+    The hashing uses 64-bit hash methods in hash.h,
+    such as FNV-1a for strings and
+    a weird method I came up multiply the hash as a double with the previous hash
+    and reinterpreting it as a uint64_t again.
+Typedef'd the Game.interruptor field to GameInterruptor and created default GameInterruptors.
+    By setting the volatile Game.interruptor field,
+    the function will be safely called to modify the game in the game thread.
+    This can pause the game (GameInterruptor_pause()) or quit the game (GameInterruptor_quit())
+    and potentially anything else.
+    Game_pause() and Game_quit() just set these interruptors for the game.
+Game_new() allocated and initializes a new Game with default values using Game_init().
+Create a Sprite struct
+    that contains an SDL_Texture*,
+    the width and height of the texture,
+    and the GameTexture enum as a unique id.
+Created a lazy, caching mechanism for loading SDL_Textures and their corresponding Sprites.
+    get_sprite() returns a Sprite* into a static array according to a GameTexture.
+        If the Sprite for that GameTexture has already been loaded, it's returned.
+        Otherwise, the SDL_Texture* is loaded and the new Sprite created and returned.
+    get_texture() does the same, just using the SDL_Texture* texture field in Sprite.
+    get_sprite() and get_texture() both take a SDL_Renderer*,
+        because it's necessary for IMG_LoadTexture(), which actually loads the SDL_Texture*.
+    The GameTexture enum is mapped to a static array of filenames in the src/textures/ directory,
+        such that each GameTexture corresponds to a texture file in src/textures/,
+        which is loaded into the Sprite[].
+

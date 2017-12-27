@@ -4,11 +4,18 @@
 
 #include "player.h"
 
-Player *Player_new(const char *const name, const SDL_Color color) {
+#include "util/hash.h"
+#include "util/sdl_colors.h"
+#include "textures.h"
+
+Player *Player_new(const char *const name, const GameTexture texture) {
+    // Player.id:  will be set later when added to a Players in a Game
+    // Player.sprite: only id set for now,
+    //                Game_add_player() will get actual Sprite using Game.renderer and id
     const Player local_player = (Player) {
-            .id = 0;
-            .name = name,
-            .color = color,
+            .id = 0,
+            .name = name, // TODO should this be copied and freed on Player_free()?
+            .sprite = {.id = texture, NULL, 0, 0},
             .position = {0, 0},
             .velocity = {0, 0},
             .orientation = 0,
@@ -49,3 +56,19 @@ void Player_update(Player *const player, const float delta_time) {
 void Player_render(const Player *const player, SDL_Renderer *const renderer) {
     // TODO
 }
+
+#define _hash(val) hash(current_hash, val)
+
+uint64_t Player_hash(const Player *const player) {
+    uint64_t current_hash = PRIME_64;
+    _hash(player->id);
+    _hash(player->position.bits);
+    _hash(player->velocity.bits);
+    _hash(player->orientation);
+    _hash(player->ammo);
+    _hash(player->sprite.id);
+    _hash(fnv1a_64_hash(player->name));
+    return current_hash;
+}
+
+#undef _hash

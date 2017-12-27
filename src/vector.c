@@ -13,7 +13,7 @@ inline Vector Vector_normalize(const Vector vector) {
 }
 
 inline Vector Vector_add(const Vector vector1, const Vector vector2) {
-	return Vector_new(vector1.x * vector2.x, vector1.y * vector2.y);
+	return Vector_new(vector1.x + vector2.x, vector1.y + vector2.y);
 }
 
 inline float Vector_dist2(const Vector vector1, const Vector vector2) {

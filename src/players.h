@@ -23,4 +23,6 @@ void Players_update(Players *players, float delta_time);
 
 void Players_render(const Players *players, SDL_Renderer *renderer);
 
+uint64_t Players_hash(const Players *players);
+
 #endif //CASTROPARTY_PLAYERS_H
