@@ -44,7 +44,7 @@ Sprite *get_sprite(GameTexture texture_index, SDL_Renderer *renderer) {
         return sprites + texture_index;
     }
     destroy_all_textures_on_exit();
-    const char *const path_parts[] = {texture_filenames[texture_index], texture_dir};
+    const char *const path_parts[] = {texture_dir, texture_filenames[texture_index]};
     const char *const path = str_join("/", path_parts, arraylen(path_parts));
     SDL_Texture *const texture = IMG_LoadTexture(renderer, path);
     free((char *) path);

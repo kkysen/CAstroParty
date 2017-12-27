@@ -9,9 +9,6 @@
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_render.h>
 
-#include "player.h"
-#include "players.h"
-
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
 #define GAME_TITLE "C-Astro Party"
@@ -19,14 +16,24 @@
 #define GAME_FPS 60
 #define GAME_DEFAULT_NUM_PLAYERS 4
 
+typedef struct game_state GameState;
+
 typedef struct game Game;
+
+#include "player.h"
+#include "players.h"
+
+struct game_state {
+    const int width;
+    const int height;
+    Players *const players;
+};
 
 typedef void (*GameInterruptor)(Game *const game);
 
 struct game {
+    const bool render;
     const char *title;
-    int width;
-    int height;
     uint8_t fps;
     uint64_t prev_time;
     volatile GameInterruptor interrupt;
@@ -34,24 +41,20 @@ struct game {
     volatile bool quit;
     SDL_Window *window;
     SDL_Renderer *renderer;
-    Players *players;
+    GameState state;
 };
 
-Game *Game_new();
+Game *Game_new(bool render);
 
-int Game_init(Game *game, const char *title, int width, int height, uint8_t fps, uint8_t max_num_players);
+int Game_init(Game *game, bool render,
+              const char *title, int width, int height,
+              uint8_t fps, uint8_t max_num_players);
 
 void Game_destroy(Game *game);
 
 int Game_add_player(const Game *game, Player *player);
 
 void Game_run(Game *game);
-
-void Game_loop(Game *game);
-
-void Game_update(Game *game, float delta_time);
-
-void Game_render(const Game *game);
 
 uint64_t Game_hash(const Game *game);
 

@@ -6,6 +6,7 @@
 #define SHELL_STR_UTILS_H
 
 #include <sys/types.h>
+#include <stdbool.h>
 
 #define is_newline(c) ((c) == '\n' || (c) == '\r')
 
@@ -30,6 +31,15 @@ char *str_copy_n(const char *s, size_t length);
  * @return the new dynamically-allocated, null-terminated string
  */
 char *str_copy(const char *s);
+
+/**
+ * Check if \param substring is a substring of \param s.
+ *
+ * @param [in] s
+ * @param [in] substring
+ * @return if \param substring is a substring of \param s
+ */
+bool str_contains(const char *s, const char *substring);
 
 /**
  * Find the number of occurences of \param substring in \param s as specified by #strstr().

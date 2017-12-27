@@ -4,7 +4,7 @@ project(CAstroParty C)
 set(CMAKE_C_STANDARD 11)
 
 set(SOURCE_FILES
-        src/main.c
+#        src/main.c
         src/player.h
         src/vector.h
         src/vector.c
@@ -25,8 +25,8 @@ set(SOURCE_FILES
         src/util/sigaction.h
         src/util/sized_string.c
         src/util/sized_string.h
-        src/util/stacktrace.c
-        src/util/stacktrace.h
+#        src/util/stacktrace.c
+#        src/util/stacktrace.h
         src/util/string_builder.c
         src/util/string_builder.h
         src/util/string_utils.c
@@ -45,6 +45,21 @@ set(SOURCE_FILES
         src/obstacles.h
         src/textures.c
         src/textures.h
-        )
+        src/client.c src/client.h)
 
 add_executable(CAstroParty ${SOURCE_FILES})
+
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
+find_package(SDL2 REQUIRED)
+find_package(OpenSSL REQUIRED)
+
+include_directories(CAstroParty
+        ${SDL2_INCLUDE_DIRS}
+        ${OPENSSL_INCLUDE_DIRS}
+        )
+
+target_link_libraries(CAstroParty
+        ${SDL2_LIBRARIES}
+        ${OPENSSL_LIBRARIES}
+        )

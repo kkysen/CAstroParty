@@ -22,6 +22,10 @@ char *str_copy(const char *const s) {
     return str_copy_n(s, strlen(s));
 }
 
+__attribute_pure__ bool str_contains(const char *s, const char *substring) {
+    return strstr(s, substring) != NULL;
+}
+
 __attribute_pure__ size_t str_num_occurrences(const char *s, const char *const substring) {
     size_t n = 0;
     while ((s = strstr(s, substring))) {

@@ -67,7 +67,12 @@ void init_home();
 #define pb(var) printf(#var": %s\n", (var) ? "true" : "false")
 #define pc(var) printf(#var": %c\n", (char) (var))
 
-#define perror(s) fprintf(stderr, "[%d] %s: %s (%s at %s:%d)\n", getpid(), s, strerror(errno), __func__, __FILE__, __LINE__)
+#define _perror(strerror_call, s) \
+    fprintf(stderr, \
+        "[%d] %s (%s at %s:%d): \n\t%s\n\n", \
+        getpid(), strerror_call, __func__, __FILE__, __LINE__, s)
+
+#define perror(s) _perror(strerror(errno), s)
 
 #define perror_assert_expr(expr) do {if (!(expr)) perror(#expr); _Static_assert(false, #expr);} while (false)
 

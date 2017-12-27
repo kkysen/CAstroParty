@@ -27,7 +27,7 @@ int Players_add(Players *const players, Player *const player) {
     }
     
     player->id = num_players - (uint8_t) 1;
-    player->velocity = {0, 0};
+    player->velocity = Vector_new(0, 0);
     // TODO verify player initial values
     
     Player *const local_players = realloc(players->players, num_players);
@@ -39,19 +39,19 @@ int Players_add(Players *const players, Player *const player) {
     return 0;
 }
 
-void Players_update(Players *const players, const float delta_time) {
+void Players_update(Players *const players, GameState *const state, const float delta_time) {
     const uint_fast8_t num_players = players->num_players;
     Player *const players_array = players->players;
     for (uint_fast8_t i = 0; i < num_players; ++i) {
-        Player_update(players_array + i, delta_time);
+        Player_update(players_array + i, state, delta_time);
     }
 }
 
-void Players_render(const Players *const players, SDL_Renderer *const renderer) {
+void Players_render(const Players *const players, const GameState *const state, SDL_Renderer *const renderer) {
     const uint_fast8_t num_players = players->num_players;
     const Player *const players_array = players->players;
     for (uint_fast8_t i = 0; i < num_players; ++i) {
-        Player_render(players_array + i, renderer);
+        Player_render(players_array + i, state, renderer);
     }
 }
 

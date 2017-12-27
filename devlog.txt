@@ -83,3 +83,9 @@ Created a lazy, caching mechanism for loading SDL_Textures and their correspondi
 khyberS -- 2017-12-26 20:51:11
 Updated DESIGN.txt with a better explanation of the game and more data structures and algorithms.
 
+khyberS -- 2017-12-27 04:28:10
+Got everything to compile correctly and start running,
+    but on my Windows laptop w/ Cygwin,
+    SDL_Init() fails because SDL_GetNumVideoDisplays() == 0
+    and thus there are no available video devices.
+

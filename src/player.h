@@ -14,12 +14,14 @@
 typedef struct {
     uint8_t id;
     const char *const name;
-	Sprite sprite;
-	Vector position;
-	Vector velocity;
-	float orientation;
-	char ammo; // TODO why is this a char?
+    Sprite sprite;
+    Vector position;
+    Vector velocity;
+    float orientation;
+    char ammo; // TODO why is this a char?
 } Player;
+
+#include "game.h"
 
 Player *Player_new(const char *name, GameTexture texture);
 
@@ -35,9 +37,9 @@ void Player_spawn(Player *player, Vector position, float orientation, char ammo)
 
 bool Player_in_radius(const Player *player, Vector position, float radius);
 
-void Player_update(Player *player, float delta_time);
+void Player_update(Player *player, GameState *state, float delta_time);
 
-void Player_render(const Player *player, SDL_Renderer *renderer);
+void Player_render(const Player *player, const GameState *state, SDL_Renderer *renderer);
 
 uint64_t Player_hash(const Player *player);
 

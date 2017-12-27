@@ -54,4 +54,6 @@ float Vector_dist2(Vector vector1, Vector vector2);
 
 #define Vector_in_radius(vector1, vector2, radius) Vector_dist(vector1, vector2) < (radius) * (radius)
 
+#define Vector_as_SDL_Point(vector) ((SDL_Point) {.x = (vector).x, .y = (vector).y})
+
 #endif // CASTROPARTY_VECTOR_H

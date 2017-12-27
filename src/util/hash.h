@@ -7,6 +7,7 @@
 
 #include <openssl/sha.h>
 #include <stdio.h>
+#include <stdint.h>
 
 typedef unsigned char byte;
 
@@ -31,8 +32,8 @@ uint64_t fp_hash(uint64_t hash, double val);
 
 #define hash(h, val) fp_hash(h, (double) (val))
 
-#define FNV1A_64_OFFSET_BASIS 14695981039346656037
-#define FNV1A_64_PRIME 1099511628211
+#define FNV1A_64_OFFSET_BASIS ((uint64_t) 14695981039346656037u)
+#define FNV1A_64_PRIME ((uint64_t) 1099511628211u)
 
 #define PRIME_64 FNV1A_64_PRIME
 
