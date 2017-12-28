@@ -7,7 +7,6 @@
 #include <unistd.h>
 
 #include "utils.h"
-#include "stacktrace.h_"
 
 int unlink_if_exists_and_then(const char *path, void ( *on_success)(const char *const path)) {
     if (unlink(path) == -1) {

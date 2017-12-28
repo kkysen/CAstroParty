@@ -89,3 +89,22 @@ Got everything to compile correctly and start running,
     SDL_Init() fails because SDL_GetNumVideoDisplays() == 0
     and thus there are no available video devices.
 
+khyberS -- 2017-12-28 15:49:52
+Got the game to actually start and render a static spaceship correctly.
+    It only works on my Ubuntu VM right now, not Windows, which is unfortunate, but okay.
+Made some changes to Game, GameState, and Player.
+    Figured out how to somewhat simulate access modifiers by creating overlapping fields through unions,
+        where one version of the field is mutable and the other is const.
+Added branchless clamp() and Vector_clamp() functions (macros) in Vector.h
+    which ensure a value is between two other values
+    without using any branching if statements, but instead the branchless, optimized fmaxf() and fminf().
+Added a Game_quit_later() method that quits the game (double) seconds later.
+    This is down by spawning a new thread that sleeps for that many seconds and then calls Game_quit().
+    Added a double_sleep() function that sleeps for that many seconds specified as a double.
+Fixed Player so that its position is the center of the sprite.
+    Also added Sprite.center, which is the float center of the size of the sprite.
+    This is useful in calculating the SDL_Rect border of the spaceship that should be rendered.
+Wrote most of Player_render() so that it render's the spaceship
+    with the correct size and position.
+    However, the orientation doesn't rotate around the correct center right now,
+    even though I set the rotation center as Player.position as an SDL_Point.

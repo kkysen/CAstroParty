@@ -80,4 +80,11 @@ void init_home();
 
 #define debug() printf("[%d] %s at %s:%d\n", getpid(), __func__, __FILE__, __LINE__)
 
+void double_sleep(double seconds);
+
+//#define new_const(type, var_name, initializer)
+//    const type _type = initializer;
+//    type *const var_name = (type *) malloc(sizeof(type));
+//    memcpy(var_name, &_type, sizeof(type))
+
 #endif // CASTROPARTY_UTILS_H

@@ -22,6 +22,10 @@ static const char *const texture_filenames[] = {
 
 static Sprite sprites[arraylen(texture_filenames)] = {0};
 
+const char *get_texture_name(const GameTexture texture) {
+    return texture_filenames[texture];
+}
+
 SDL_Texture *get_texture(const GameTexture texture_index, SDL_Renderer *const renderer) {
     const Sprite *const sprite = get_sprite(texture_index, renderer);
     if (!sprite) {
@@ -31,6 +35,7 @@ SDL_Texture *get_texture(const GameTexture texture_index, SDL_Renderer *const re
 }
 
 void remove_texture(const GameTexture texture_index) {
+    printf("Removing texture: %s\n", texture_filenames[texture_index]);
     Sprite *const sprite = sprites + texture_index;
     if (sprite->texture) {
         SDL_DestroyTexture(sprite->texture);
@@ -62,6 +67,7 @@ Sprite *get_sprite(GameTexture texture_index, SDL_Renderer *renderer) {
             .texture = texture,
             .width = width,
             .height = height,
+            .center = Vector_new(width * 0.5f, height * 0.5f),
     };
     memcpy(sprites + texture_index, &sprite, sizeof(Sprite));
     return sprites + texture_index;

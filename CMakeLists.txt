@@ -25,8 +25,8 @@ set(SOURCE_FILES
         src/util/sigaction.h
         src/util/sized_string.c
         src/util/sized_string.h
-#        src/util/stacktrace.c
-#        src/util/stacktrace.h
+        src/util/stacktrace.c
+        src/util/stacktrace.h
         src/util/string_builder.c
         src/util/string_builder.h
         src/util/string_utils.c

@@ -7,6 +7,8 @@
 
 #include <SDL2/SDL_render.h>
 
+#include "vector.h"
+
 typedef enum {
     BLUE_PLAYER = 0,
     GREEN_PLAYER,
@@ -19,7 +21,10 @@ typedef struct {
     SDL_Texture *const texture;
     const int width;
     const int height;
+    const Vector center;
 } Sprite;
+
+const char *get_texture_name(GameTexture texture);
 
 SDL_Texture *get_texture(GameTexture texture, SDL_Renderer *renderer);
 

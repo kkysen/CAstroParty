@@ -6,6 +6,7 @@
 
 #include "util/hash.h"
 #include "util/sdl_utils.h"
+#include "textures.h"
 
 Player *Player_new(const char *const name, const GameTexture texture) {
     Player *const player = (Player *) malloc(sizeof(Player));
@@ -51,23 +52,28 @@ void Player_update(Player *const player, GameState *const state, const float del
     // copy to stack for faster access
     Vector position = player->position;
     Vector velocity = player->velocity;
-    const Vector acceleration = Player_get_acceleration(player);
-    Vector_i_mul_add(velocity, acceleration, delta_time);
+    
+    if (false) {
+        player->orientation += 360.0f / 60.0f / 5.0f; //ANGULAR_VELOCITY;
+    }
+    
+    // only true if button pressed and is currently accelerating
+    if (false) {
+        const Vector acceleration = Player_get_acceleration(player);
+        Vector_i_mul_add(velocity, acceleration, delta_time);
+    }
+    
     Vector_i_scale(velocity, MAX_SPEED_FACTOR);
     Vector_i_mul_add(position, velocity, delta_time);
     
     // keep in borders
-    if (position.x < 0) {
-        position.x = 0;
-    } else if (position.x > state->width) {
-        position.x = state->width;
-    }
     
-    if (position.y < 0) {
-        position.y = 0;
-    } else if (position.y > state->height) {
-        position.y = state->height;
-    }
+    Vector center = player->sprite.center;
+    
+    // performant, possibly branchless if optimized
+    Vector_clamp(position,
+                 center.x, center.y,
+                 state->width - center.x, state->width - center.y);
     
     // copy back to Player*
     player->position = position;
@@ -75,13 +81,27 @@ void Player_update(Player *const player, GameState *const state, const float del
 }
 
 void Player_render(const Player *const player, const GameState *const state, SDL_Renderer *const renderer) {
-    printf("Rendering player: \"%s\"\n", player->name);
-    const SDL_Point center = Vector_as_SDL_Point(player->position);
+//    printf("Rendering player: \"%s\"\n", player->name);
+    if (state->tick % state->fps == 0) {
+        // run once a second
+        pz(state->tick);
+        pv(player->position);
+        pv(player->velocity);
+    }
+    const Vector position = player->position;
+    const Vector sprite_center = player->sprite.center;
+    const SDL_Rect dest_rect = {
+            .x = (int) (position.x - sprite_center.x),
+            .y = (int) (position.y - sprite_center.y),
+            .w = (int) sprite_center.x,
+            .h = (int) sprite_center.y,
+    };
+    SDL_Point center = Vector_as_SDL_Point(position);
     sdl_warn_perror(SDL_RenderCopyEx(
             renderer,
             player->sprite.texture,
             NULL, // TODO change later
-            NULL, // TODO change later
+            &dest_rect,
             player->orientation,
             &center,
             SDL_FLIP_NONE

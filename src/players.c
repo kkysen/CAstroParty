@@ -7,6 +7,7 @@
 #include "util/utils.h"
 #include "util/hash.h"
 #include "player.h"
+#include "textures.h"
 
 void Players_free(Players *const players) {
     free(players->players);
@@ -27,10 +28,11 @@ int Players_add(Players *const players, Player *const player) {
     }
     
     player->id = num_players - (uint8_t) 1;
+//    Vector_i_add(player->position, player->sprite.center); // TODO is this right
     player->velocity = Vector_new(0, 0);
     // TODO verify player initial values
     
-    Player *const local_players = realloc(players->players, num_players);
+    Player *const local_players = realloc(players->players, num_players * sizeof(Player));
     check_null_msg(local_players, "realloc(game->players, num_players)");
     memcpy(local_players + num_players - 1, player, sizeof(Player));
     players->players = local_players;

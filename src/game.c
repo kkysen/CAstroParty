@@ -4,11 +4,11 @@
 
 #include "game.h"
 
+#include <pthread.h>
+
 #include "util/sdl_colors.h"
 #include "util/sdl_utils.h"
-#include "util/string_utils.h"
 #include "util/hash.h"
-#include "player.h"
 
 static int Game_init_renderer(Game *game);
 
@@ -87,7 +87,6 @@ int Game_init(Game *const game, const bool render, const char *const title,
     memcpy((bool *) &game->render, &render, sizeof(bool));
     
     game->title = str_copy(title);
-    game->fps = fps;
     
     game->prev_time = 0;
     game->interrupt = NULL;
@@ -102,12 +101,18 @@ int Game_init(Game *const game, const bool render, const char *const title,
     players->players = NULL;
     
     const GameState state = {
+            ._x = 0,
+            ._y = 0,
             .width = width,
             .height = height,
+            .size = Vector_new(width, height),
             .players = players,
     };
     memcpy(&game->state, &state, sizeof(GameState));
-//    game->state = state;
+    
+    // must write these after memcpy of GameState overwrites them
+    game->fps = fps;
+    game->tick = 0;
     
     if (game->render) {
         if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -138,13 +143,14 @@ static void GameState_free(GameState *const state) {
 // TODO must also signal to other games on network
 void Game_destroy(Game *const game) {
     GameState_free(&game->state);
-    const GameState state = {
-            .width = 0,
-            .height = 0,
-            .players = NULL,
-    };
+    const uint8_t fps = game->fps;
+    const uint64_t tick = game->tick;
+    // will overwrite unionized fps and tick, so must restore these fields
+    // b/c fps and tick might be useful after game ended
+    const GameState state = {0};
     memcpy(&game->state, &state, sizeof(GameState));
-//    game->state = state;
+    game->fps = fps;
+    game->tick = tick;
     
     if (game->render) {
         SDL_DestroyRenderer(game->renderer);
@@ -161,16 +167,19 @@ void Game_destroy(Game *const game) {
     
     game->interrupt = NULL;
     
-    game->fps = 0;
-    
     free((char *) game->title);
     game->title = NULL;
 }
 
 int Game_add_player(const Game *const game, Player *const player) {
-    check_perror(Players_add(game->state.players, player));
-    memcpy(&player->sprite, get_sprite(player->sprite.id, game->renderer), sizeof(Sprite));
 //    player->sprite = *get_sprite(player->sprite.id, game->renderer);
+    memcpy(&player->sprite, get_sprite(player->sprite.id, game->renderer), sizeof(Sprite));
+    check_perror(Players_add(game->state.players, player));
+    printf("%s's sprite: %s (%dx%d)\n",
+           player->name,
+           get_texture_name(player->sprite.id),
+           player->sprite.width,
+           player->sprite.height);
     // TODO if (!game->render) don't load texture, but still want texture size
     return 0;
 }
@@ -186,6 +195,7 @@ void Game_run(Game *const game) {
             game->interrupt(game);
         }
         if (game->quit) {
+            printf("Quitting Game \"%s\"\n", game->title);
             Game_destroy(game);
             return;
         }
@@ -194,6 +204,8 @@ void Game_run(Game *const game) {
 }
 
 static void Game_loop(Game *const game) {
+    game->tick++;
+    
     // apparently V-Sync already restricts FPS to an optimal rate for the computer
     const uint64_t current_time = SDL_GetPerformanceCounter();
     GameState *const state = &game->state;
@@ -210,6 +222,7 @@ static void Game_loop(Game *const game) {
 }
 
 static void GameState_update(GameState *const state, const float delta_time) {
+    // this should only be updated once here
     Players_update(state->players, state, delta_time);
 }
 
@@ -226,6 +239,7 @@ static void GameState_render(const GameState *const state, SDL_Renderer *const r
 
 static uint64_t GameState_hash(const GameState *const state) {
     uint64_t current_hash = PRIME_64;
+    _hash(state->tick);
     _hash(state->width);
     _hash(state->height);
     _hash(Player_hash((const Player *) state->players));
@@ -261,4 +275,29 @@ const GameInterruptor GameInterruptor_quit = _GameInterruptor_quit;
 
 void Game_quit(Game *const game) {
     game->interrupt = GameInterruptor_quit;
+}
+
+typedef struct {
+    Game *const game;
+    const double seconds;
+} TimedGame;
+
+static void *_Game_quit_later(void *arg) {
+    const TimedGame *const timed_game = (TimedGame *) arg;
+    printf("Will quit Game \"%s\" in %f seconds\n", timed_game->game->title, timed_game->seconds);
+    double_sleep(timed_game->seconds);
+    Game_quit(timed_game->game);
+    free((void *) timed_game);
+    return NULL;
+}
+
+void Game_quit_later(Game *const game, const double seconds) {
+    const TimedGame timed_game = {.game = game, .seconds = seconds};
+    TimedGame *const timed_game_ptr = (TimedGame *) malloc(sizeof(TimedGame));
+    memcpy(timed_game_ptr, &timed_game, sizeof(TimedGame));
+    
+    pthread_t thid;
+    if (pthread_create(&thid, NULL, _Game_quit_later, (void *) timed_game_ptr) != 0) {
+        perror("pthread_create(&thid, NULL, _Game_quit_later, (void *) &timed_game)");
+    }
 }
