@@ -108,3 +108,12 @@ Wrote most of Player_render() so that it render's the spaceship
     with the correct size and position.
     However, the orientation doesn't rotate around the correct center right now,
     even though I set the rotation center as Player.position as an SDL_Point.
+
+khyberS -- 2017-12-29 02:51:17
+Added todo.txt containing stuff we need to do.
+    Right now, I added mostly network stuff.
+Added install-libffcall.sh, an install script for libffcall,
+    which lets us create native closures in C,
+    which in turn allows us to create native OOP in C.
+    We're thinking about using this if it's easy enough to use and useful enough.
+

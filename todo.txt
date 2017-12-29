@@ -1,0 +1,102 @@
+TODO
+
+add member const bool Game::is_client (or is_server)
+
+add member Player const *const Player GameState::own_player:
+    will be NULL when !Game::is_client
+
+add member const bool Player::is_own:
+    will be true only for GameState::own_player
+
+add member const int Player::socket_fd,
+    which will be on open socket descriptor
+    that will either send data to the server:
+        the client will write to
+        GameState::own_player::socket_fd
+    or receive data from the server:
+        the client will read from
+        GameState::players::players.filter(!Player::is_own).forEach(Player::socket_fd)
+    or receive data from the clients:
+        the server will read from
+        GameState::players::players.forEach(Player::socket_fd)
+
+add typedef uint8_t Reaction
+    Reaction will contains 5 bit fields:
+        bool is_accelerating
+        bool is_turning
+        bool is_shooting
+        bool is_terminated
+        bool sent_hash
+    this will be stored in a single byte
+    this Reaction will be sent from each client to the server every frame (so 60 times/sec)
+    120 B/s (60 read, 60 write) is extremely little,
+    so our game should have practically zero network lag
+
+add macro void Reaction_set_is_accelerating(Reaction reaction, const bool is_accelerating)
+
+add macro void Reaction_set_is_turning(Reaction reaction, const bool is_turning)
+
+add macro void Reaction_set_is_shooting(Reaction reaction, const bool is_shooting)
+
+add macro void Reaction_set_is_terminated(Reaction reaction, const bool is_terminated)
+
+add macro void Reaction_set_sent_hash(Reaction reaction, const bool sent_hash)
+
+add macro Reaction Reaction_new(
+    const bool is_accelerating,
+    const bool is_turning,
+    const bool is_shooting,
+    const bool is_terminated,
+    const bool sent_hash
+)
+
+add macro bool Reaction_is_accelerating(Reaction reaction)
+
+add macro bool Reaction_is_turning(Reaction reaction)
+
+add macro bool Reaction_is_shooting(Reaction reaction)
+
+add macro bool Reaction_is_terminated(Reaction reaction)
+
+add macro bool Reaction_sent_hash(Reaction reaction)
+
+add function Reaction Reaction_poll():
+    will poll local input events (i.e. key presses)
+    and create a new Reaction out of it
+
+add function void Player_send_reaction(const Player *const player, const Reaction reaction):
+    s.t. (player->is_own && game->is_client) || (!player->is_own && !game->is_client)
+    this will send the reaction to over the network using player->socket_fd
+    player->is_own && game->is_client =>
+        client will send reaction to server
+    !player->is_own && !game->is_client =>
+        server will send received (from another client) reaction to client
+
+add function Reaction Player_receive_reaction(const Player *const player):
+    // TODO unfinished
+    s.t. !player->is_own
+    this will receive the reaction
+
+add function void Player_react(Player *const player, const Reaction reaction):
+    will update the player's state according to the reaction
+    this will not move the player, for example,
+    but will only change the acceleration or orientation
+
+add typedef struct {
+    const Reaction reaction;
+    const uint64_t hash;
+} GamePacket:
+     Reaction_sent_hash(reaction) => hash was sent and must be checked
+    !Reaction_sent_hash(reaction) => no hash sent (not 0, nothing)
+    hash might not be sent every frame, we'll decide later
+        if we do, then we'll send ~1 KB/s for the hash
+    if the hashes are not equal,
+        then either the client is doing something illegal,
+            in which case a proper client will quit immediately
+            and the server will send Reaction_is_terminated(reaction) immediately
+                and remove/kill that player
+        or the server messed up big time,
+            in which case, there's not much we can do
+
+TODO finish this stuff
+add function void
