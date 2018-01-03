@@ -1,14 +1,18 @@
 TODO
 
+ADDED, NOT IMPLEMENTED
 add member const bool Game::is_client (or is_server)
 
+ADDED, NOT IMPLEMENTED
 add member Player const *const Player GameState::own_player:
     will be NULL when !Game::is_client
 
+ADDED, NOT IMPLEMENTED
 add member const bool Player::is_own:
     will be true only for GameState::own_player
 
-add member const int Player::socket_fd,
+ADDED, NOT IMPLEMENTED
+add member const int Player::socket_fd:
     which will be on open socket descriptor
     that will either send data to the server:
         the client will write to
@@ -20,28 +24,35 @@ add member const int Player::socket_fd,
         the server will read from
         GameState::players::players.forEach(Player::socket_fd)
 
+ADDED
 add typedef uint8_t Reaction
     Reaction will contains 5 bit fields:
-        bool is_accelerating
-        bool is_turning
-        bool is_shooting
-        bool is_terminated
-        bool sent_hash
+        const bool is_accelerating;
+        const bool is_turning;
+        const bool is_shooting;
+        const bool is_terminated;
+        const bool sent_hash;
     this will be stored in a single byte
     this Reaction will be sent from each client to the server every frame (so 60 times/sec)
     120 B/s (60 read, 60 write) is extremely little,
     so our game should have practically zero network lag
 
-add macro void Reaction_set_is_accelerating(Reaction reaction, const bool is_accelerating)
+ADDED
+add macro Reaction Reaction_set_is_accelerating(const Reaction reaction, const bool is_accelerating)
 
-add macro void Reaction_set_is_turning(Reaction reaction, const bool is_turning)
+ADDED
+add macro Reaction Reaction_set_is_turning(const Reaction reaction, const bool is_turning)
 
-add macro void Reaction_set_is_shooting(Reaction reaction, const bool is_shooting)
+ADDED
+add macro Reaction Reaction_set_is_shooting(const Reaction reaction, const bool is_shooting)
 
-add macro void Reaction_set_is_terminated(Reaction reaction, const bool is_terminated)
+ADDED
+add macro Reaction Reaction_set_is_terminated(const Reaction reaction, const bool is_terminated)
 
-add macro void Reaction_set_sent_hash(Reaction reaction, const bool sent_hash)
+ADDED
+add macro Reaction Reaction_set_sent_hash(const Reaction reaction, const bool sent_hash)
 
+ADDED
 add macro Reaction Reaction_new(
     const bool is_accelerating,
     const bool is_turning,
@@ -50,16 +61,22 @@ add macro Reaction Reaction_new(
     const bool sent_hash
 )
 
+ADDED
 add macro bool Reaction_is_accelerating(Reaction reaction)
 
+ADDED
 add macro bool Reaction_is_turning(Reaction reaction)
 
+ADDED
 add macro bool Reaction_is_shooting(Reaction reaction)
 
+ADDED
 add macro bool Reaction_is_terminated(Reaction reaction)
 
+ADDED
 add macro bool Reaction_sent_hash(Reaction reaction)
 
+ADDED
 add function Reaction Reaction_poll():
     will poll local input events (i.e. key presses)
     and create a new Reaction out of it
@@ -82,6 +99,7 @@ add function void Player_react(Player *const player, const Reaction reaction):
     this will not move the player, for example,
     but will only change the acceleration or orientation
 
+ADDED, NOT IMPLEMENTED
 add typedef struct {
     const Reaction reaction;
     const uint64_t hash;
@@ -100,3 +118,222 @@ add typedef struct {
 
 TODO finish this stuff
 add function void
+
+
+fix struct Player:
+    all coordinates should assume a 1x1 screen size
+    only when rendering will these coordinates be expanded to the correct position
+        this will ensure that the coordinates will be the same across all clients and the server
+        even though different clients can potentially have different screen sizes
+    and the Game_hash will still be the same,
+        allowing the server to verify that the client is running legally
+    to do this,
+        ACCELERATION will have to be adjusted to the smaller "screen"
+        the Vector_clamp() call in Player_update() will have to be adjusted to a 1x1 boundary
+    this might make Game_update() more performant, since all the 1s will be hardcoded
+        instead of referencing the screen size
+        but Game_render() will be a bit slower to compensate
+    this will also make resizing the screen easier,
+        since no game objects will be affected by the change
+        only how they are rendered will be,
+        but all the ..._render() functions reference the screen size when rendering anyways
+
+fix function Game_hash(const Game *const game):
+    fields to be hashed:
+        game->is_running
+        game->quit
+        game->fps
+        game->tick
+        game->title (if performance concerned, can be cached)
+        game->state
+
+fix function GameState_hash(const GameState *const state):
+    fields to be hashed:
+        state->players
+        state->bullets (TODO)
+        state->obstacles (TODO)
+    state->fps and state->tick are already hashed in Game_hash()
+        b/c they are overlapping, unionized fields
+    state->bullets and state->obstacles will be implemented later
+        similarly to Players state->players
+
+fix function Players_hash(const Players *const players):
+    fields to be hashed:
+        players->max_num_players
+        players->num_players
+        forEach(players->players)
+
+fix function Player_hash(const Player *const player):
+    fields to be hashed:
+        player->id
+        player->position
+        player->orientation
+        player->ammo
+        player->sprite.id
+        player->name (can be cached)
+    player->velocity can be skipped since position depends on velocity
+    orientation does, too, but since orientation is directly rendered each frame,
+        we should check it in case
+
+ADDED
+fix struct String:
+    add field uint64_t hash
+    will lazily contain an FNV-1a hash of the string
+
+ADDED
+add function uint64_t String_hash(String s):
+    if s.hash == 0, s.hash = fnv1a_64_hash(s.chars)
+    return s.hash
+
+ADDED, NOT IMPLEMENTED
+fix most const char *const strings:
+    switch them to Strings with a cached hash
+
+fix struct Sprite:
+    right now, a Sprite contains an SDL_Texture*,
+    whose size is independent of the current screen size
+    but since all game updates treat the screen size as if it were 1x1,
+    the Sprite and SDL_Texture need a size relative to the 1x1 screen size,
+    so that clamping the positions (of players, bullets, obstacles, etc.)
+    can be done correctly and not let the sprite be pushed partially offscreen
+    therefore, all Sprites + SDL_Textures need a corresponding size fraction
+    that will be set when loaded in get_texture() and get_sprite()
+    and possibly hashed in Game_hash()
+    in practice, this means:
+        there has to be Map<GameTexture, Vector>,
+        i.e. another array with corresponding GameTexture indices
+        where the Vector is the relative size of the texture
+    this can also be implemented by using the actual sizes of the textures as a base
+    and then setting a const ideal size to create the size fraction
+    on very large screens, this might make the texture very fuzzy,
+    but there's not really any good way to fix it except get higher resolution textures
+
+fix struct Sprite or struct Player:
+    if on the server game, no SDL_Textures need to be loaded,
+    but the Sprite::ids and relative sizes need to still be loaded,
+    since they are used in Game_hash()
+    since the relative Sprite sizes might be calculated partially from their real sizes,
+    the actual SDL_Textures might have to be loaded,
+    their sizes queried, and then immediately destroyed
+    it might be possible to do this another way by reading image metadata directly,
+    but it might just be easier to destroy the SDL_Texture immediately afterwards
+
+add function int GameState_reload_sprites(GameState *const state):
+    reload all Sprites in all game objects,
+                b/c SDL_Textures won't be loaded on different computer
+
+add function int Game_init_graphics(Game *const game):
+    initializes all necessary SDL graphics
+    and updates necessary Game and GameState fields with the correct size values
+        i.e. game->state->width and game->state->height
+    this will also call Game_init_window_and_renderer(game),
+        which should do most of the rest of the work
+
+add function void *Game_serialize(const Game *const game):
+
+
+add function int Game_deserialize(Game *const game, void *const data):
+
+
+add function void Players_invalidate_sockets(Players *const players):
+    players.forEach(player->socket_fd = -1);
+
+ADDED
+add function void Player_invalidate_socket(Player *const player):
+    player->socket_fd = -1;
+
+add function int Game_init_client(Game *const game):
+    let socket = game->state->own_player->socket_fd
+    open + set up socket
+    do some sort of handshake over socket
+    receive from socket entire serialized Game
+    memcpy(game, server_game, sizeof(Game)) / deserialize
+    modify game to become a client game:
+        game->is_client = true;
+        game->render = true;
+        game->interrupt = NULL;
+        game->prev_time = 0;
+        game->state->own_player = own_player (will be done later)
+        Players_invalidate_sockets(game->state->players);
+        GameState_reload_sprites(game->state);
+        Game_init_graphics(game);
+    prompt the user to choose a name and texture,
+        s.t. the name and textures are unique w.r.t the existing game->players
+    create a new player from this user input
+    set game->state->own_player = this new player
+    send to socket the serialized own_player,
+        in response to which the server game will add it to it's own
+
+add function int Game_init_server(Game *const game,
+        const char *const title,
+        const uint8_t fps,
+        const uint8_t max_num_players,
+        const Vector relative_texture_size,
+        const uint16_t listening_port,
+        const char *const ip_address):
+    initializes game similarly to how Game_init() currently does
+    but no rendering and graphics stuff is set up
+
+fix functions Game_new(), Game_init(), etc.:
+    see Game_init_client() and Game_init_server()
+
+ADDED, NOT IMPLEMENTED
+fix struct Game:
+    unionize Game::is_client and Game::render
+
+ADDED, NOT IMPLEMENTED
+fix struct Game:
+    add field GameServer *const server
+     Game::is_client => Game::server = NULL
+    !Game::is_client => Game::server = actual server
+
+ADDED, NOT IMPLEMENTED
+add typedef struct {
+    const int listening_socket_fd;
+    pthread_t const listening_thread; // pthread_t is a typedef'd pointer
+} GameServer:
+    should/must be allocated on heap (not stack, global might be ok) for multi-threaded use
+
+ADDED, NOT IMPLEMENTED
+add typedef struct {
+    SDL_Window *const window;
+    SDL_Renderer *const renderer;
+} GameClient:
+    this is just Game::window and Game::renderer refactored out
+
+ADDED, NOT IMPLEMENTED
+fix struct Game:
+    refactor Game::window and Game::renderer into GameClient
+    add union {
+        GameServer *const server;
+        GameClient *const client;
+    }
+    !Game::is_client => Game::server is valid
+     Game::is_client => Game::client is valid
+
+fix struct Reaction:
+    add a bit field: const bool sent_more
+    if set, it indicates that more data will be sent in that frame
+    the extra data will be specified later
+
+fix function void Game_loop(Game *const game):
+    we can't rely on SDL_GetPerformanceCounter() and SDL_GetPerformanceFrequency()
+        to calculate a delta_time to use in GameState_update()
+    if we do, delta_time will be different on different clients and the server,
+    and thus Game_hash() will give different results since all the positions
+    will be slightly different
+    therefore, we have to run Game_loop() exactly every 1 / game->fps seconds,
+    or at least run GameState_update() with the same delta_time, 1 / game->fps,
+    on every frame, so that the server and clients stay in perfect sync
+    thus we have to differentiate exact, precise, logical frames that run GameState_update(),
+    and imprecise, graphical, rendering frames that call GameState_render() whenever ready,
+        possibly on a separate thread
+    the question is, though, what happens if the computer slows down
+        and a logical frame is missed?
+    it must skip it, but then it also has to keep track of the real time
+    to do so, it should use:
+        struct timespec tp;
+        clock_gettime(CLOCK_MONOTONIC, &tp);
+        see man page for more details:
+            we need declared _POSIX_C_SOURCE
+            and possibly link w/ -lrt

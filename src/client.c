@@ -14,7 +14,7 @@
 
 int run(const float orientation) {
     //    set_stack_trace_signal_handler();
-    Game *const game = Game_new(true);
+    Game *const game = _Game_new(true);
     sdl_check_null_perror_msg(game, "Game_new(true)");
     p("Created game");
     Player *const player = Player_new("Khyber", BLUE_PLAYER);

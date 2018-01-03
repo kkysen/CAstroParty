@@ -32,21 +32,28 @@ static void _GameInterruptor_quit(Game *game);
 
 // =============================================
 
-Game *Game_new(const bool render) {
+// Game must be declared on heap for multi-threading to work
+Game *_Game_new(bool is_client) {
     Game *const game = (Game *) malloc(sizeof(Game));
     if (!game) {
         perror("malloc(sizeof(Game))");
         return NULL;
     }
-    if (Game_init(
-            game, render, GAME_TITLE,
-            WINDOW_WIDTH, WINDOW_HEIGHT, GAME_FPS,
-            GAME_DEFAULT_NUM_PLAYERS) == -1) {
-        sdl_perror("Game_init(game, render, GAME_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, GAME_FPS, GAME_DEFAULT_NUM_PLAYERS)");
+    if (_Game_init_default(game, is_client) == -1) {
+        sdl_perror("Game_init_default(game, is_client)");
         free(game);
         return NULL;
     }
     return game;
+}
+
+// Game must be declared on heap for multi-threading to work
+int _Game_init_default(Game *game, bool is_client) {
+    sdl_check_perror(_Game_init(
+            game, is_client, GAME_TITLE,
+            WINDOW_WIDTH, WINDOW_HEIGHT, GAME_FPS,
+            GAME_DEFAULT_NUM_PLAYERS));
+    return 0;
 }
 
 static int Game_init_renderer(Game *const game) {
@@ -81,9 +88,11 @@ static int Game_init_window_and_renderer(Game *const game) {
     return 0;
 }
 
-int Game_init(Game *const game, const bool render, const char *const title,
-              const int width, const int height, const uint8_t fps, const uint8_t max_num_players) {
-    // Game.render is const, so memcpy
+int _Game_init(Game *game, bool is_client, const char *title,
+               int width, int height, uint8_t fps, uint8_t max_num_players) {
+    const bool render = is_client; // this should always be true;
+    // Game::is_client and Game::render are const, so memcpy
+    memcpy((bool *) &game->is_client, &is_client, sizeof(bool));
     memcpy((bool *) &game->render, &render, sizeof(bool));
     
     game->title = str_copy(title);
@@ -100,6 +109,8 @@ int Game_init(Game *const game, const bool render, const char *const title,
     players->num_players = 0;
     players->players = NULL;
     
+    Players_add(players, own_player);
+    
     const GameState state = {
             ._x = 0,
             ._y = 0,
@@ -107,6 +118,7 @@ int Game_init(Game *const game, const bool render, const char *const title,
             .height = height,
             .size = Vector_new(width, height),
             .players = players,
+            .own_player = is_client ? NULL : own_player,
     };
     memcpy(&game->state, &state, sizeof(GameState));
     
@@ -133,6 +145,34 @@ int Game_init(Game *const game, const bool render, const char *const title,
     }
     
     return 0;
+}
+
+int Game_init_client(Game *game) {
+    // FIXME totally unfinished
+    
+    const int socket_fd = 0; // FIXME implement connection later
+    const Game *const server_game = NULL; // FIXME receive over socket, implement later
+    memcpy(game, server_game, sizeof(Game)); // FIXME replace with real deserialization later
+    
+    const bool is_client = true;
+    memcpy((bool *) &game->is_client, &is_client, sizeof(bool));
+    game->interrupt = NULL;
+    game->prev_time = 0; // FIXME might change later b/c of Game_loop() reworking
+    Players_invalidate_sockets(game->state.players);
+    // FIXME implement these functions
+    // GameState_reload_sprites(game->state);
+    // Game_init_graphics(game);
+    
+    const char *const name = NULL; // FIXME should be read from user input
+    const GameTexture texture = BLUE_PLAYER; // FIXME should be selected by user
+    
+    Player *const own_player = NULL; // FIXME construct using name and texture later
+    memcpy((Player *) &game->state.own_player, own_player, sizeof(Player));
+    
+    const void *const serialized_own_player = NULL;
+    // TODO sent over socket back to client
+    
+    Game_add_player(game, own_player);
 }
 
 static void GameState_free(GameState *const state) {
@@ -211,8 +251,8 @@ static void Game_loop(Game *const game) {
     GameState *const state = &game->state;
     SDL_Renderer *const renderer = game->renderer;
     if (game->is_running) {
-        const uint64_t delta_ticks = current_time - game->prev_time;
-        const float delta_time = (delta_ticks * 1000.0f) / SDL_GetPerformanceFrequency();
+        const uint64_t delta_cycles = current_time - game->prev_time;
+        const float delta_time = (delta_cycles * 1000.0f) / SDL_GetPerformanceFrequency();
         GameState_update(state, delta_time);
         if (game->render) {
             GameState_render(state, renderer);
@@ -239,6 +279,7 @@ static void GameState_render(const GameState *const state, SDL_Renderer *const r
 
 static uint64_t GameState_hash(const GameState *const state) {
     uint64_t current_hash = PRIME_64;
+    _hash(state->fps);
     _hash(state->tick);
     _hash(state->width);
     _hash(state->height);
@@ -249,7 +290,9 @@ static uint64_t GameState_hash(const GameState *const state) {
 uint64_t Game_hash(const Game *const game) {
     uint64_t current_hash = PRIME_64;
     _hash(game->is_running);
+    _hash(game->quit);
     _hash(game->fps);
+    _hash(game->tick);
     _hash(fnv1a_64_hash(game->title));
     _hash(GameState_hash(&game->state));
     return current_hash;
@@ -291,6 +334,8 @@ static void *_Game_quit_later(void *arg) {
     return NULL;
 }
 
+// Game must be allocated on heap for this to work,
+// because it uses a separated thread and threads have separate stacks
 void Game_quit_later(Game *const game, const double seconds) {
     const TimedGame timed_game = {.game = game, .seconds = seconds};
     TimedGame *const timed_game_ptr = (TimedGame *) malloc(sizeof(TimedGame));

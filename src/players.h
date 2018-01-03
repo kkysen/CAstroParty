@@ -20,6 +20,8 @@ struct players {
 
 void Players_free(Players *players);
 
+void Players_invalidate_sockets(Players *players);
+
 int Players_add(Players *players, Player *player);
 
 void Players_update(Players *players, GameState *state, float delta_time);

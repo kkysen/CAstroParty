@@ -117,3 +117,8 @@ Added install-libffcall.sh, an install script for libffcall,
     which in turn allows us to create native OOP in C.
     We're thinking about using this if it's easy enough to use and useful enough.
 
+khyberS -- 2018-01-03 14:57:59
+Changed a lot of stuff in todo.txt.
+    There a bunch of important changes/things we need to do.
+    I didn't quite finish everything I was in the middle of changing
+        and adding to todo.txt since I had to finish college apps first.

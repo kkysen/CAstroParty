@@ -15,6 +15,14 @@ void Players_free(Players *const players) {
     players->num_players = 0;
 }
 
+void Players_invalidate_sockets(Players *const players) {
+    const uint_fast8_t num_players = players->num_players;
+    Player *const players_array = players->players;
+    for (uint_fast8_t i = 0; i < num_players; ++i) {
+        Player_invalidate_socket(players_array + i);
+    }
+}
+
 int Players_add(Players *const players, Player *const player) {
     const uint8_t num_players = players->num_players + (uint8_t) 1;
     if (num_players == 0) {

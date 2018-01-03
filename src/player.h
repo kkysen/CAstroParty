@@ -13,27 +13,21 @@
 
 typedef struct {
     uint8_t id;
-    const char *const name;
+    const String name;
     Sprite sprite;
     Vector position;
     Vector velocity;
     float orientation;
     char ammo; // TODO why is this a char?
+    const bool is_own;
+    const int socket_fd;
 } Player;
 
 #include "game.h"
 
 Player *Player_new(const char *name, GameTexture texture);
 
-/**
- * Place player in the world.
- *
- * @param player
- * @param position
- * @param orientation
- * @param ammo
- */
-void Player_spawn(Player *player, Vector position, float orientation, char ammo);
+void Player_invalidate_socket(Player *player);
 
 bool Player_in_radius(const Player *player, Vector position, float radius);
 
