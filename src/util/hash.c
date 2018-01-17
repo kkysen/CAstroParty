@@ -9,7 +9,7 @@
 
 #include "io.h"
 
-byte sha256_md[SHA256_DIGEST_LENGTH] = {0};
+/*byte sha256_md[SHA256_DIGEST_LENGTH] = {0};
 
 void sha256_r(const void *const bytes, const size_t size, void *const digest) {
     SHA256(bytes, size, digest);
@@ -58,7 +58,7 @@ int verify_sha256(const int fd, const void *const bytes, const size_t size, cons
     printf("\n");
     
     return 0;
-}
+}*/
 
 inline uint64_t fp_hash(const uint64_t hash, const double val) {
     LongDouble u = {.d = val};
