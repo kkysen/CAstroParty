@@ -45,7 +45,7 @@ set(SOURCE_FILES
         src/obstacles.h
         src/textures.c
         src/textures.h
-        src/client.c src/client.h src/reaction.c src/reaction.h src/game_packet.c src/game_packet.h)
+        src/client.c src/client.h)
 
 add_executable(CAstroParty ${SOURCE_FILES})
 

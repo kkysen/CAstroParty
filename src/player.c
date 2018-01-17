@@ -6,6 +6,7 @@
 
 #include "util/hash.h"
 #include "util/sdl_utils.h"
+#include "textures.h"
 
 Player *Player_new(const char *const name, const GameTexture texture) {
     Player *const player = (Player *) malloc(sizeof(Player));
@@ -28,10 +29,11 @@ Player *Player_new(const char *const name, const GameTexture texture) {
     return player;
 }
 
-void Player_invalidate_socket(Player *const player) {
-    // b/c player->socket_fd is declared as const
-    const int invalid_socket = -1;
-    memcpy((int *) &player->socket_fd, &invalid_socket, sizeof(int));
+void Player_spawn(Player *const player, const Vector position, const float orientation, const char ammo) {
+    player->position = position;
+    player->orientation = orientation;
+    player->ammo = ammo;
+    // TODO
 }
 
 static inline Vector Player_get_acceleration(const Player *const player) {

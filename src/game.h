@@ -22,17 +22,6 @@ typedef struct game Game;
 
 #include "player.h"
 #include "players.h"
-#include "util/sized_string.h"
-
-typedef struct {
-    const int listening_socket_fd;
-    pthread_t const listening_thread; // pthread_t is a typedef'd pointer // NOLINT
-} GameServer;
-
-typedef struct {
-    SDL_Window *const window;
-    SDL_Renderer *const renderer;
-} GameClient;
 
 struct game_state {
     // mutable only by overlapping (union-ized) members in Game
@@ -49,25 +38,19 @@ struct game_state {
     };
     const Vector size;
     Players *const players;
-    Player *const own_player;
 };
 
 typedef void (*GameInterruptor)(Game *const game);
 
 struct game {
-    union {
-        const bool is_client;
-        const bool render;
-    };
-    union {
-        GameServer *const server;
-        GameClient *const client;
-    };
-    const String title;
+    const bool render;
+    const char *title;
     uint64_t prev_time;
     volatile GameInterruptor interrupt;
     volatile bool is_running;
     volatile bool quit;
+    SDL_Window *window;
+    SDL_Renderer *renderer;
     union {
         // struct provides mutable accessors to
         // fps and tick members of GameStates
@@ -79,28 +62,12 @@ struct game {
     };
 };
 
-// @Deprecated
-Game *_Game_new(bool is_client);
+Game *Game_new(bool render);
 
-// @Deprecated
-int _Game_init_default(Game *game, bool is_client);
-
-// @Deprecated
 // TODO change width and height to doubles that are a fraction of the screen's total size
-int _Game_init(Game *game, bool is_client,
-               const char *title, int width, int height,
-               uint8_t fps, uint8_t max_num_players);
-
-int Game_init_client(Game *game);
-
-int Game_init_server(
-        Game *game,
-        const char *title,
-        uint8_t fps,
-        uint8_t max_num_players,
-        Vector relative_texture_size,
-        uint16_t listening_port,
-        const char *ip_address);
+int Game_init(Game *game, bool render,
+              const char *title, int width, int height,
+              uint8_t fps, uint8_t max_num_players);
 
 void Game_destroy(Game *game);
 
