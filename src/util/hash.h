@@ -5,7 +5,7 @@
 #ifndef SYSTEMS_HASH_H
 #define SYSTEMS_HASH_H
 
-#include <openssl/sha.h>
+//#include <openssl/sha.h>
 #include <stdio.h>
 #include <stdint.h>
 
