@@ -31,7 +31,7 @@ int unlink_if_exists(const char *const path) {
 
 int read_bytes(const int fd, void *const bytes, const size_t size) {
     const ssize_t bytes_read = read(fd, bytes, size);
-    if (bytes_read != size) {
+    if (bytes_read != (ssize_t) size) {
         perror("read(fd, bytes, size)");
         check(bytes_read);
         fprintf(stderr, "%zd != %zu", bytes_read, size);
@@ -40,7 +40,7 @@ int read_bytes(const int fd, void *const bytes, const size_t size) {
 }
 
 int write_bytes(const int fd, const void *const bytes, const size_t size) {
-    if (write(fd, bytes, size) != size) {
+    if (write(fd, bytes, size) != (ssize_t) size) {
         perror("write(fd, bytes, size)");
         return -1;
     }
@@ -101,7 +101,7 @@ String read_string(const int fd) {
     }
     const size_t actual_length = (size_t) signed_actual_length;
     chars[actual_length] = 0;
-    if (signed_actual_length != length) {
+    if (signed_actual_length != (ssize_t) length) {
         chars = realloc(chars, actual_length + 1);
     }
     return (String) {.length = actual_length, .chars = chars};
