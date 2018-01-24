@@ -132,3 +132,8 @@ Added Game_client_connect() in game_client_connect.h,
 Some of the helper functions and (de)serialization isn't finished yet,
     but the main stuff is finished.
 Note: I added the newer Game version in game2.h.
+
+khyberS -- 2018-01-24 04:29:29
+Started adding code for serialization for each of the game objects in src/serialize,
+    but all the actual code isn't written yet, only the headers and default serialize() method.
+

@@ -12,6 +12,12 @@
 
 #include "util/utils.h"
 
+const Buffer INVALID_BUFFER = {
+        .data = NULL,
+        .index = 0,
+        .length = -1,
+};
+
 typedef int (*ConnectOrBind)(int socket_fd, const struct sockaddr *address, int address_length);
 
 static int open_socket(IpPort ip_port, const ConnectOrBind connect_or_bind) {
@@ -165,22 +171,20 @@ int recv_all_into(const int socket_fd, Buffer *const buffer) {
 }
 
 Buffer recv_all(const int socket_fd) {
-    const Buffer invalid_buffer = {.data = NULL, .index = 0, .length = -1};
-    
     if (socket_fd < 0) {
         perror("invalid socket");
-        return invalid_buffer;
+        return INVALID_BUFFER;
     }
     
     ssize_t size;
     if (recv(socket_fd, &size, sizeof(size), 0) != sizeof(size)) {
         perror("couldn't receive size");
-        return invalid_buffer;
+        return INVALID_BUFFER;
     }
     
     if (size < 0) {
         perror("received negative size");
-        return invalid_buffer;
+        return INVALID_BUFFER;
     }
     
     if (size == 0) {
@@ -194,12 +198,13 @@ Buffer recv_all(const int socket_fd) {
     };
     if (!buffer.data) {
         perror("malloc");
-        return invalid_buffer;
+        return INVALID_BUFFER;
     }
     
     if (recv_all_into_with_size(socket_fd, &buffer, size) == -1) {
         perror("recv_all_into_with_size(socket_fd, &buffer, size)");
-        return invalid_buffer;
+        free(buffer.data);
+        return INVALID_BUFFER;
     }
     return buffer;
 }

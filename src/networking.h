@@ -22,6 +22,8 @@ typedef struct {
     ssize_t length;
 } Buffer;
 
+extern const Buffer INVALID_BUFFER;
+
 /**
  * Opens and binds to a socket to a local \param port.
  *

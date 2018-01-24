@@ -5,8 +5,12 @@
 #include "game_client_connect.h"
 
 #include "util/utils.h"
+#include "serialize/game_serialization.h"
+#include "serialize/player_serialization.h"
 
 static int Game_client_fork_server(Game *game, IpPort ip_port);
+
+static int Game_client_init_graphics(Game *game);
 
 static int Game_client_init_fields(Game *game);
 
@@ -34,6 +38,10 @@ static int Game_client_fork_server(Game *const game, const IpPort ip_port) {
     return -1;
 }
 
+static int Game_client_init_graphics(Game *const game) {
+
+}
+
 static int Game_client_init_fields(Game *const game) {
     const bool is_client = true;
     memcpy((bool *) &game->is_client, &is_client, sizeof(bool));
@@ -42,7 +50,7 @@ static int Game_client_init_fields(Game *const game) {
     
     Players_invalidate_sockets(game->state.players);
     GameState_reload_sprites(game->state);
-    Game_init_graphics(game);
+    Game_client_init_graphics(game);
     
     return 0;
 }
@@ -68,6 +76,7 @@ static int Game_client_add_own_player_with_name_and_texture(
         goto error;
     }
     
+    memcpy((int *) &own_player->socket_fd, &socket_fd, sizeof(int));
     memcpy((Player *) &game->state.own_player, own_player, sizeof(Player));
     return 0;
     
