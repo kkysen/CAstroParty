@@ -122,3 +122,6 @@ Added documentation to reaction.h and reaction.c, including Reaction_example().
 Commented out the SHA hash stuff in hash.c that's not needed right now.
     This allows us to not link with -lssl, which wasn't working on the school computers.
 Added install-sdl2.sh, a script that installs the necessary SDL2 libraries (including SDL2_image).
+
+khyberS -- 2018-01-23 23:37:05
+Added networking util functions in networking.h that bind, listen, and connect to IP addresses and ports.
