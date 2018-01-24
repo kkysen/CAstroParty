@@ -125,3 +125,10 @@ Added install-sdl2.sh, a script that installs the necessary SDL2 libraries (incl
 
 khyberS -- 2018-01-23 23:37:05
 Added networking util functions in networking.h that bind, listen, and connect to IP addresses and ports.
+
+khyberS -- 2018-01-24 03:57:44
+Added Game_client_connect() in game_client_connect.h,
+    which connects a client Game to a server Game.
+Some of the helper functions and (de)serialization isn't finished yet,
+    but the main stuff is finished.
+Note: I added the newer Game version in game2.h.

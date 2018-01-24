@@ -5,10 +5,22 @@
 #ifndef CASTROPARTY_NETWORKING_H
 #define CASTROPARTY_NETWORKING_H
 
+#include <unistd.h>
+
+#ifndef MSG_MORE
+    #define MSG_MORE 0x8000
+#endif
+
 typedef struct {
     const char *const ip_address;
     const char *const port;
 } IpPort;
+
+typedef struct {
+    void *data;
+    size_t index;
+    ssize_t length;
+} Buffer;
 
 /**
  * Opens and binds to a socket to a local \param port.
@@ -33,5 +45,15 @@ int listen_to_socket(const char *port);
  * @return the socket file descriptor, or -1 if error
  */
 int connect_to_socket(IpPort ip_port);
+
+int send_all(int socket_fd, Buffer buffer);
+
+int recv_all_into(int socket_fd, Buffer *buffer);
+
+Buffer recv_all(int socket_fd);
+
+int send_acknowledgement(int socket_fd);
+
+int check_acknowledgement(int socket_fd);
 
 #endif // CASTROPARTY_NETWORKING_H

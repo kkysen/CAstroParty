@@ -8,7 +8,7 @@
 #include "util/sdl_utils.h"
 #include "textures.h"
 
-Player *Player_new(const char *const name, const GameTexture texture) {
+Player *Player_new(const String name, const GameTexture texture) {
     Player *const player = (Player *) malloc(sizeof(Player));
     if (!player) {
         return NULL;

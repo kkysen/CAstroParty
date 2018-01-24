@@ -6,6 +6,7 @@
 
 #include "vector.h"
 #include "textures.h"
+#include "util/sized_string.h"
 
 #define ACCELERATION 0.166666666666f
 #define ANGULAR_VELOCITY 6
@@ -13,17 +14,19 @@
 
 typedef struct {
     uint8_t id;
-    const char *const name;
+    const String name;
     Sprite sprite;
     Vector position;
     Vector velocity;
     float orientation;
     char ammo; // TODO why is this a char?
+    const bool is_own;
+    const int socket_fd;
 } Player;
 
 #include "game.h"
 
-Player *Player_new(const char *name, GameTexture texture);
+Player *Player_new(String name, GameTexture texture);
 
 /**
  * Place player in the world.
