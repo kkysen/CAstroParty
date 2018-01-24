@@ -117,3 +117,8 @@ Added install-libffcall.sh, an install script for libffcall,
     which in turn allows us to create native OOP in C.
     We're thinking about using this if it's easy enough to use and useful enough.
 
+khyberS -- 2018-01-23 22:02:49
+Added documentation to reaction.h and reaction.c, including Reaction_example().
+Commented out the SHA hash stuff in hash.c that's not needed right now.
+    This allows us to not link with -lssl, which wasn't working on the school computers.
+Added install-sdl2.sh, a script that installs the necessary SDL2 libraries (including SDL2_image).

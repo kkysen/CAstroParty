@@ -1,0 +1,8 @@
+//
+// Created by kkyse on 1/23/2018.
+//
+
+#ifndef CASTROPARTY_NETWORKING_H
+#define CASTROPARTY_NETWORKING_H
+
+#endif //CASTROPARTY_NETWORKING_H

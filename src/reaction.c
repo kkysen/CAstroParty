@@ -8,6 +8,20 @@
 
 #include "util/sdl_utils.h"
 
+void Reaction_example() {
+    Reaction reaction = REACTION_IS_SHOOTING;
+    
+    const bool is_accelerating = Reaction_is_accelerating(reaction);
+    assert(is_accelerating == false);
+    
+    const bool is_shooting = Reaction_is_shooting(reaction);
+    assert(is_shooting == true);
+    
+    Reaction_set_is_turning(reaction, true);
+    const bool is_turning = Reaction_is_turning(reaction);
+    assert(is_turning == true);
+}
+
 // TODO are these the right keys
 #define ACCELERATE_KEY SDLK_UP
 #define TURN_KEY SDLK_RIGHT
