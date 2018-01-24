@@ -45,7 +45,7 @@ set(SOURCE_FILES
         src/obstacles.h
         src/textures.c
         src/textures.h
-        src/client.c src/client.h src/reaction.c src/reaction.h src/game_packet.c src/game_packet.h src/networking.c src/networking.h src/game2.c src/game2.h src/game_client_connect.c src/game_client_connect.h src/serialize/game_serialization.c src/serialize/game_serialization.h src/serialize/serialization.c src/serialize/serialization.h src/serialize/player_serialization.c src/serialize/player_serialization.h)
+        src/client.c src/client.h src/reaction.c src/reaction.h src/game_packet.c src/game_packet.h src/networking.c src/networking.h src/game2.c src/game2.h src/game_client_connect.c src/game_client_connect.h src/serialize/game_serialization.c src/serialize/game_serialization.h src/serialize/serialization.c src/serialize/serialization.h src/serialize/player_serialization.c src/serialize/player_serialization.h src/serialize/players_serialization.c src/serialize/players_serialization.h src/serialize/buffer.c src/serialize/buffer.h src/serialize/game_state_serialization.c src/serialize/game_state_serialization.h)
 
 add_executable(CAstroParty ${SOURCE_FILES})
 

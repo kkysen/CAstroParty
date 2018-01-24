@@ -7,12 +7,21 @@
 #include "util/utils.h"
 #include "serialize/game_serialization.h"
 #include "serialize/player_serialization.h"
+#include "util/sdl_utils.h"
 
 static int Game_client_fork_server(Game *game, IpPort ip_port);
 
-static int Game_client_init_graphics(Game *game);
+static int GameClient_init_window(GameClient *client, const Game *game);
 
-static int Game_client_init_fields(Game *game);
+static int GameClient_init_renderer(GameClient *client);
+
+static int GameClient_init(GameClient *client, const Game *game);
+
+static void GameClient_destroy(GameClient *client);
+
+static int GameState_load_sprites(GameState *state, SDL_Renderer *renderer);
+
+static int Game_client_init_graphics(Game *game);
 
 static int Game_client_add_own_player_with_name_and_texture(
         Game *game, int socket_fd, String name, GameTexture texture);
@@ -21,38 +30,100 @@ static int Game_client_add_own_player(Game *game, int socket_fd);
 
 static int Game_client_fork_server(Game *const game, const IpPort ip_port) {
     const int socket_fd = connect_to_socket(ip_port);
-    const Buffer server_game = recv_all(socket_fd);
+    Buffer server_game = recv_all(socket_fd);
     if (server_game.length == -1) {
         perror("recv_all(socket_fd)");
-        goto error;
+        check_perror(close(socket_fd));
+        return -1;
     }
-    if (Game_deserialize(game, server_game) == -1) {
-        perror("Game_deserialize(game, server_game)");
-        free(server_game.data);
-        goto error;
-    }
-    return socket_fd;
     
-    error:
-    check_perror(close(socket_fd));
-    return -1;
+    // deserialization sets default values for a client
+    Game_deserialize(game, &server_game);
+    return socket_fd;
+}
+
+static int GameClient_init_window(GameClient *const client, const Game *const game) {
+    const SDL_Window *const window = SDL_CreateWindow(
+            game->title.chars,
+            SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED,
+            game->state.width,
+            game->state.height,
+            SDL_WINDOW_OPENGL
+    );
+    sdl_check_null_perror_msg(
+            window,
+            "SDL_CreateWindow(game->title.chars, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, game->state.width, game->state.height, SDL_WINDOW_OPENGL)");
+    set_field(client->window, window);
+    return 0;
+}
+
+static int GameClient_init_renderer(GameClient *const client) {
+    const SDL_Renderer *const renderer =
+            SDL_CreateRenderer(client->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    sdl_check_null_perror_msg(
+            renderer, "SDL_CreateRenderer(client->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)");
+    set_field(client->renderer, renderer);
+    return 0;
+}
+
+static int GameClient_init(GameClient *const client, const Game *const game) {
+    sdl_check_perror(GameClient_init_window(client, game));
+    if (GameClient_init_renderer(client) == -1) {
+        GameClient_destroy(client);
+        sdl_perror("GameClient_init_renderer(game)");
+        return -1;
+    }
+    return 0;
+}
+
+static void GameClient_destroy(GameClient *const client) {
+    if (client->window) {
+        SDL_DestroyWindow(client->window);
+        set_field(client->window, NULL);
+    }
+    
+    if (client->renderer) {
+        SDL_DestroyRenderer(client->renderer);
+        set_field(client->renderer, NULL);
+    }
+}
+
+static int GameState_load_sprites(GameState *const state, SDL_Renderer *const renderer) {
+    if (Players_load_sprites(state->players, renderer) == -1) {
+        perror("Players_load_sprites(state->players, renderer)");
+        // sprites are cleaned up atexit()
+        return -1;
+    }
+    
+    return 0;
 }
 
 static int Game_client_init_graphics(Game *const game) {
-
-}
-
-static int Game_client_init_fields(Game *const game) {
-    const bool is_client = true;
-    memcpy((bool *) &game->is_client, &is_client, sizeof(bool));
-    game->interrupt = NULL;
-    game->prev_time = 0;
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+        sdl_perror("SDL_Init(SDL_INIT_EVERYTHING)");
+        if (str_contains(SDL_GetError(), "No available video device")) {
+            sdl_log_func(stderr, SDL_GetNumVideoDrivers(), 1);
+            sdl_log_func(stderr, SDL_GetNumVideoDisplays(), 1);
+        }
+        return -1;
+    }
     
-    Players_invalidate_sockets(game->state.players);
-    GameState_reload_sprites(game->state);
-    Game_client_init_graphics(game);
+    if (GameClient_init(game->client, game) == -1) {
+        sdl_perror("GameClient_init(game->client, game)");
+        goto error;
+    }
     
+    if (GameState_load_sprites(&game->state, game->client->renderer) == -1) {
+        perror("GameState_load_sprites(&game->state)");
+        goto error;
+    }
     return 0;
+    
+    error:
+    GameClient_destroy(game->client);
+    SDL_Quit();
+    return -1;
 }
 
 static int Game_client_add_own_player_with_name_and_texture(
@@ -105,8 +176,8 @@ int Game_client_connect(Game *game, IpPort ip_port) {
         return -1;
     }
     
-    if (Game_client_init_fields(game) == -1) {
-        perror("Game_client_init_fields(game)");
+    if (Game_client_init_graphics(game) == -1) {
+        perror("Game_client_init_graphics(game)");
         goto error;
     }
     
@@ -118,6 +189,7 @@ int Game_client_connect(Game *game, IpPort ip_port) {
     return 0;
     
     error:
+    Game_destroy(game); // FIXME Game_destroy() must be updated
     close(socket_fd);
     return -1;
 }

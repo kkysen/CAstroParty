@@ -137,3 +137,15 @@ khyberS -- 2018-01-24 04:29:29
 Started adding code for serialization for each of the game objects in src/serialize,
     but all the actual code isn't written yet, only the headers and default serialize() method.
 
+khyberS -- 2018-01-24 17:56:30
+Finished everything in Game_client_connect()
+    except for choosing the new player's texture and name.
+Wrote serializers and deserializers for Game, GameState, Players, and Player in src/serialize,
+    which don't serialize all data and when deserializing,
+    fill in these fields with client defaults.
+Added the Buffer class,
+    which has the generic macro methods
+    Buffer_put(), Buffer_put_array(), Buffer_get(), and Buffer_get_array().
+buffer.h also has the macro functions set_field_memory() and set_field(),
+    which set const fields or variables using memcpy().
+

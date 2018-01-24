@@ -12,11 +12,9 @@
 
 #include "util/utils.h"
 
-const Buffer INVALID_BUFFER = {
-        .data = NULL,
-        .index = 0,
-        .length = -1,
-};
+static const int LISTENING_BACKLOG = 10;
+
+static int ACK = 0xCAFEBABE;
 
 typedef int (*ConnectOrBind)(int socket_fd, const struct sockaddr *address, int address_length);
 
@@ -74,8 +72,6 @@ int connect_to_socket(IpPort ip_port) {
     check_msg(socket_fd, "open_socket(ip_port, connect)");
     return socket_fd;
 }
-
-static const int LISTENING_BACKLOG = 10;
 
 int listen_to_socket(const char *const port) {
     const int socket_fd = bind_to_socket(port);
@@ -207,4 +203,25 @@ Buffer recv_all(const int socket_fd) {
         return INVALID_BUFFER;
     }
     return buffer;
+}
+
+int send_acknowledgement(const int socket_fd) {
+    if (send(socket_fd, &ACK, sizeof(ACK), 0) != sizeof(ACK)) {
+        perror("couldn't send acknowledgment");
+        return -1;
+    }
+    return 0;
+}
+
+int check_acknowledgement(const int socket_fd) {
+    int ack;
+    if (recv(socket_fd, &ack, sizeof(ACK), 0) != sizeof(ACK)) {
+        perror("didn't receive acknowledgment");
+        return -1;
+    }
+    if (ack != ACK) {
+        perror("received invalid acknowledgment");
+        return -1;
+    }
+    return 0;
 }

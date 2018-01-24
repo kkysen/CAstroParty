@@ -28,4 +28,6 @@ void Players_render(const Players *players, const GameState *state, SDL_Renderer
 
 uint64_t Players_hash(const Players *players);
 
+int Players_load_sprites(Players *players, SDL_Renderer *renderer);
+
 #endif //CASTROPARTY_PLAYERS_H

@@ -7,6 +7,8 @@
 
 #include <unistd.h>
 
+#include "serialize/buffer.h"
+
 #ifndef MSG_MORE
     #define MSG_MORE 0x8000
 #endif
@@ -15,14 +17,6 @@ typedef struct {
     const char *const ip_address;
     const char *const port;
 } IpPort;
-
-typedef struct {
-    void *data;
-    size_t index;
-    ssize_t length;
-} Buffer;
-
-extern const Buffer INVALID_BUFFER;
 
 /**
  * Opens and binds to a socket to a local \param port.

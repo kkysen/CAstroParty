@@ -8,6 +8,7 @@
 #include "util/hash.h"
 #include "player.h"
 #include "textures.h"
+#include "serialize/buffer.h"
 
 void Players_free(Players *const players) {
     free(players->players);
@@ -65,4 +66,19 @@ uint64_t Players_hash(const Players *const players) {
         hash = hash(hash, Player_hash(players_array + i));
     }
     return hash;
+}
+
+int Players_load_sprites(Players *const players, SDL_Renderer *const renderer) {
+    const uint_fast8_t num_players = players->num_players;
+    const Player *const players_array = players->players;
+    for (uint_fast8_t i = 0; i < num_players; ++i) {
+        const Player *const player = players_array + i;
+        const Sprite *const sprite = get_sprite(player->sprite.id, renderer);
+        if (!sprite) {
+            perror("invalid GameTexture or SDL_Renderer: get_sprite(player->sprite.id, renderer)");
+            return -1;
+        }
+        set_field_memory(player->sprite, sprite);
+    }
+    return 0;
 }

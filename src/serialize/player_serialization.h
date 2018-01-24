@@ -5,15 +5,15 @@
 #ifndef CASTROPARTY_PLAYER_SERIALIZATION_H
 #define CASTROPARTY_PLAYER_SERIALIZATION_H
 
-#include "../networking.h"
+#include "buffer.h"
 #include "../player.h"
 
-size_t Player_serialized_length(Player *Player);
+size_t Player_serialized_length(Player *player);
 
-void Player_serialize_into(Player *Player, Buffer *buffer);
+void Player_serialize_into(Player *player, Buffer *buffer);
 
-Buffer Player_serialize(Player *Player);
+Buffer Player_serialize(Player *player);
 
-int Player_deserialize(Player *Player, Buffer buffer);
+void Player_deserialize(Player *player, Buffer *buffer);
 
 #endif // CASTROPARTY_PLAYER_SERIALIZATION_H
