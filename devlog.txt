@@ -149,3 +149,8 @@ Added the Buffer class,
 buffer.h also has the macro functions set_field_memory() and set_field(),
     which set const fields or variables using memcpy().
 
+khyberS -- 2018-01-24 18:39:37
+Finished the functions for choosing the new player's texture and name
+    except for the actual functions that read in input (now in client_init_input.h).
+    These functions are repeatedly called until a unique name and texture are chosen.
+

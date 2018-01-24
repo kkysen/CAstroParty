@@ -10,6 +10,7 @@
 #include "vector.h"
 
 typedef enum {
+    INVALID_PLAYER = -1,
     BLUE_PLAYER = 0,
     GREEN_PLAYER,
     PURPLE_PLAYER,

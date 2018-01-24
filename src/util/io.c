@@ -84,20 +84,20 @@ String read_string(const int fd) {
     size_t length;
     if (read_size(fd, &length) == -1) {
         perror("read_size(fd, &length)");
-        return BAD_STRING;
+        return INVALID_STRING;
     }
     
     char *chars = (char *) calloc(length + 1, sizeof(char));
     if (!chars) {
         perror("calloc(length + 1, sizeof(char))");
-        return BAD_STRING;
+        return INVALID_STRING;
     }
     
     const ssize_t signed_actual_length = read(fd, chars, length);
     if (signed_actual_length == -1) {
         perror("read(fd, chars, length)");
         free(chars);
-        return BAD_STRING;
+        return INVALID_STRING;
     }
     const size_t actual_length = (size_t) signed_actual_length;
     chars[actual_length] = 0;

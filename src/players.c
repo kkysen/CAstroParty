@@ -82,3 +82,22 @@ int Players_load_sprites(Players *const players, SDL_Renderer *const renderer) {
     }
     return 0;
 }
+
+#define define_Players_have_field(field, Type, equals_expr) \
+bool Players_have_##field(const Players *const players, const Type field) { \
+    const uint_fast8_t num_players = players->num_players; \
+    const Player *const players_array = players->players; \
+    for (uint_fast8_t i = 0; i < num_players; ++i) { \
+        const Player *const player = players_array + i; \
+        if (equals_expr) { \
+            return true; \
+        } \
+    } \
+    return false; \
+}
+
+define_Players_have_field(name, String, String_equals(name, player->name));
+
+define_Players_have_field(texture, GameTexture, texture == player->sprite.id);
+
+#undef define_Players_have_field

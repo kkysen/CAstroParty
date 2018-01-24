@@ -8,6 +8,9 @@
 #include "serialize/game_serialization.h"
 #include "serialize/player_serialization.h"
 #include "util/sdl_utils.h"
+#include "client_init_input.h"
+
+static uint8_t MAX_PLAYER_CHOOSES = 100;
 
 static int Game_client_fork_server(Game *game, IpPort ip_port);
 
@@ -22,6 +25,10 @@ static void GameClient_destroy(GameClient *client);
 static int GameState_load_sprites(GameState *state, SDL_Renderer *renderer);
 
 static int Game_client_init_graphics(Game *game);
+
+static String get_player_name(const Players *players);
+
+static GameTexture get_player_texture(const Players *players);
 
 static int Game_client_add_own_player_with_name_and_texture(
         Game *game, int socket_fd, String name, GameTexture texture);
@@ -157,16 +164,52 @@ static int Game_client_add_own_player_with_name_and_texture(
     return -1;
 }
 
+#define define_get_player_field(field, Type, invalid_expr, invalid_value) \
+static Type get_player_##field(const Players *const players) { \
+    for (uint8_t attempt = 0; attempt < MAX_PLAYER_CHOOSES; ++attempt) { \
+        const Type value = choose_player_##field(); \
+        if (invalid_expr) { \
+            return invalid_value; \
+        } \
+         \
+        if (!Players_have_##field(players, value)) { \
+            return value; \
+        } \
+    } \
+    perror("exceeded max num attempts to choose player "#field); \
+    return invalid_value; \
+}
+
+define_get_player_field(name, String, !value.chars, INVALID_STRING);
+
+define_get_player_field(texture, GameTexture, value == INVALID_PLAYER, INVALID_PLAYER);
+
+#undef define_get_player_field
+
 static int Game_client_add_own_player(Game *const game, const int socket_fd) {
-    const String name = {0}; // FIXME should be read from user input
-    const GameTexture texture = BLUE_PLAYER; // FIXME should be selected by user
+    const Players *const players = game->state.players;
+    
+    const String name = get_player_name(players);
+    if (!name.chars) {
+        perror("Invalid Name: get_player_name(players)");
+        goto error;
+    }
+    
+    const GameTexture texture = get_player_texture(players);
+    if (texture == INVALID_PLAYER) {
+        perror("Invalid Player Texture: get_player_texture(players)");
+        goto error;
+    }
     
     if (Game_client_add_own_player_with_name_and_texture(game, socket_fd, name, texture) == -1) {
         perror("Game_client_add_own_player_with_name_and_texture(game, socket_fd, name, texture)");
-        // free name
-        return -1;
+        goto error;
     }
     return 0;
+    
+    error:
+    free(name.chars);
+    return -1;
 }
 
 int Game_client_connect(Game *game, IpPort ip_port) {

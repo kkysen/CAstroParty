@@ -30,4 +30,8 @@ uint64_t Players_hash(const Players *players);
 
 int Players_load_sprites(Players *players, SDL_Renderer *renderer);
 
+bool Players_have_name(const Players *players, String name);
+
+bool Players_have_texture(const Players *players, GameTexture texture);
+
 #endif //CASTROPARTY_PLAYERS_H
