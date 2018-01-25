@@ -25,6 +25,8 @@ SDL_Event Game_sdl_event;
 
 char *Game_client_ip;
 
+uint64_t game_tick = 0;
+
 /* void Game_sdl_init()
  *  Init sdl elements (window and renderer)
  */
@@ -163,7 +165,7 @@ void Game_tick() {
         } 
     }
 
-
+    game_tick++;
     ObjectHandler_tick();
 
     // InputHandler_tick() MUST be called after the object tick

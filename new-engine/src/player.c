@@ -7,6 +7,7 @@
 #include "game.h"
 #include "input_handler.h"
 #include "util/sdl_utils.h"
+#include "vector.h"
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
@@ -26,7 +27,7 @@ struct player *Player_create(float x, float y, int server_index) {
     p("calloced player");
     pp(player);
     
-    player->acceleration = 0.4;
+    player->acceleration = 0.3;
     player->x = x;
     player->y = y;
     player->server_index = server_index;
@@ -73,10 +74,18 @@ void Player_update(struct player *player) {
 
     player->button_shoot_prev = player->button_shoot;
 
-//    Vector center = player->sprite->center;
-//
-//    // performant, possibly branchless if optimized
-//    const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Vector center = player->sprite->center;
+
+    // performant, possibly branchless if optimized
+    const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    Vector copy = position;
+    clamp(copy.x, center.x, window.x - center.x);
+    pf(copy.x);
+    if (copy.x < center.x) {
+        pv(copy);
+    }
+
 //    Vector_clamp(position,
 //                 center.x, center.y,
 //                 window.x - center.x, window.y - center.y);
