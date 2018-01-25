@@ -60,9 +60,9 @@ float Vector_dist2(Vector vector1, Vector vector2);
     (val) = fmaxf(val, min); \
     (val) = fminf(val, max)
 
-#define Vector_clamp(vector, min_x, min_y, max_x, max_y) \
-    clamp((vector).x, min_x, max_x); \
-    clamp((vector).y, min_y, max_y)
+#define Vector_clamp(vector, min, max) \
+    clamp((vector).x, (min).x, (max).x); \
+    clamp((vector).y, (min).y, (max).y)
 
 #define pv(vector) printf(#vector": (%f, %f)\n", (vector).x, (vector).y)
 

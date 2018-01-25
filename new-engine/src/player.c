@@ -62,14 +62,9 @@ void Player_update(struct player *player) {
     
     Vector center = player->sprite->center;
 
-    // performant, possibly branchless if optimized
     const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
-    
-    clamp(position.x, center.x, window.x - center.x);
-    clamp(position.y, center.y, window.y - center.y);
-//    Vector_clamp(position,
-//                 center.x, center.y,
-//                 window.x - center.x, window.y - center.y);
+    // performant, possibly branchless if optimized
+    Vector_clamp(position, center, window);
     
     // copy back to Player*
     player->position = position;
