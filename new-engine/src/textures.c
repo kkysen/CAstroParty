@@ -7,9 +7,9 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 
-#include "../../src/util/utils.h"
-#include "../../src/util/sdl_utils.h"
-#include "../../src/vector.h"
+#include "util/utils.h"
+#include "util/sdl_utils.h"
+#include "vector.h"
 
 static const char *const texture_dir = "src/textures";
 

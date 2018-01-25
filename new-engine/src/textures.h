@@ -7,7 +7,7 @@
 
 #include <SDL2/SDL_render.h>
 
-#include "../../src/vector.h"
+#include "vector.h"
 
 typedef enum {
     INVALID_PLAYER = -1,
