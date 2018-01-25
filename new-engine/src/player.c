@@ -73,7 +73,7 @@ void Player_render(struct player *player) {
             NULL, // TODO change later
             &dest_rect,
             player->angle,
-            &center,
+            NULL,
             SDL_FLIP_NONE
     ));
     SDL_RenderDrawRect(Game_renderer, &dest_rect);
