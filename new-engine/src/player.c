@@ -19,7 +19,8 @@ static GameTexture next_texture = BLUE_PLAYER;
  *      Use Handler_new_player(x,y)
  */
 struct player *Player_create(float x, float y, int server_index) {
-    struct player *player = malloc( sizeof(struct player) );
+    struct player *player = calloc(1, sizeof(struct player) );
+    
     player->x = x;
     player->y = y;
     player->server_index = server_index;
@@ -66,7 +67,7 @@ void Player_render(struct player *player) {
             .w = (int) sprite_center.x,
             .h = (int) sprite_center.y,
     };
-    SDL_Point center = Vector_as_SDL_Point(position);
+//    SDL_Point center = Vector_as_SDL_Point(position);
     sdl_warn_perror(SDL_RenderCopyEx(
             Game_renderer,
             player->sprite->texture,
