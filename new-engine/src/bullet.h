@@ -1,6 +1,7 @@
 
 #include <SDL2/SDL.h>
 #include "vector.h"
+#include "textures.h"
 
 #ifndef D_BULLET
 #define D_BULLET
@@ -10,27 +11,27 @@
 
 typedef struct {
     union {
+        Vector position;
         struct {
             float x;
             float y;
         };
-        Vector pos;
     };
     union {
+        Vector velocity;
         struct {
             float vel_x;
             float vel_y;
         };
-        Vector vel;
     };
     
     int timer; // Timer, increasing each frame
     
-    SDL_Rect *rect; // Drawing purposes only
+    const Sprite sprite;
 } Bullet;
 
 
-Bullet *Bullet_create(Vector pos, float angle);
+Bullet *Bullet_create(Vector position, float angle);
 
 void Bullet_update(Bullet *bullet);
 

@@ -7,6 +7,7 @@
 #include "game.h"
 #include "util/sdl_utils.h"
 #include "bullet.h"
+#include "serialize/buffer.h"
 
 #define PLAYER_MAX_SPEED 4
 
@@ -22,29 +23,26 @@ Vector Player_direction(Player *const player) {
  *      Creates a new player object but does NOT add it to our game yet.
  *      Use Handler_new_player(x,y)
  */
-Player *Player_create(float x, float y, int server_index) {
-    p("callocing player");
-    Player *player = calloc(1, sizeof(Player));
-    p("calloced player");
-    pp(player);
-    
-    player->acceleration = 0.3;
-    player->x = x;
-    player->y = y;
-    player->server_index = server_index;
-    player->angle = 180;
-    
-    player->button_turn = false;
-    player->button_shoot = false;
-    
-    player->angular_velocity = 5;
-    
-    player->rect = malloc(sizeof(SDL_Rect));
-    
-    player->sprite = get_sprite(next_texture, Game_renderer);
+Player *Player_create(const Vector position, const int server_index) {
+    const Player player = {
+            .position = position,
+            .velocity = {0},
+            .acceleration = 0.3,
+            .server_index = server_index,
+            .angle = 180,
+            .angular_velocity = 5,
+            .button_turn = false,
+            .button_shoot = false,
+            .button_shoot_prev = false,
+            .sprite = {},
+    };
+    const Sprite *const sprite = get_sprite(next_texture, Game_renderer);
     next_texture = (next_texture + 1) % NUM_PLAYERS;
+    set_field_memory(player.sprite, sprite);
     
-    return player;
+    Player *const heap_player = (Player *) malloc(sizeof(Player));
+    memcpy(heap_player, &player, sizeof(Player));
+    return heap_player;
 }
 
 void Player_update(Player *player) {
@@ -67,7 +65,7 @@ void Player_update(Player *player) {
     
     Vector_i_add(position, velocity);
     
-    Vector center = player->sprite->center;
+    Vector center = player->sprite.center;
     // performant, possibly branchless if optimized
     Vector_clamp(position, center, window_size);
     
@@ -95,7 +93,7 @@ void Player_render(Player *player) {
             255);
     
     const Vector position = player->position;
-    const Vector sprite_center = player->sprite->center;
+    const Vector sprite_center = player->sprite.center;
     const SDL_Rect dest_rect = {
             .x = (int) (position.x - sprite_center.x),
             .y = (int) (position.y - sprite_center.y),
@@ -105,8 +103,8 @@ void Player_render(Player *player) {
 //    SDL_Point center = Vector_as_SDL_Point(position);
     sdl_warn_perror(SDL_RenderCopyEx(
             Game_renderer,
-            player->sprite->texture,
-            NULL, // TODO change later
+            player->sprite.texture,
+            NULL,
             &dest_rect,
             player->angle,
             NULL,

@@ -2,22 +2,26 @@
 #include "game.h"
 #include "bullet.h"
 #include "vector.h"
+#include "serialize/buffer.h"
 
 /** Bullet_create(x, y)
  *
  *      Creates a new bullet object but does NOT add it to our game yet.
  *      Use Handler_new_bullet(x,y)
  */
-Bullet *Bullet_create(Vector pos, float angle) {
-    Bullet *bullet = malloc( sizeof(Bullet) );
-    bullet->pos = pos;
-
-    bullet->vel_x = 8.0f * cosf(angle);
-    bullet->vel_y = 8.0f * sinf(angle);
+Bullet *Bullet_create(Vector position, float angle) {
+    const Bullet bullet = {
+            .position = position,
+            .velocity = Vector_scale(Vector_new(cosf(angle), sinf(angle)), 8.0f),
+            .timer = 0,
+            .sprite = {},
+    };
+    const Sprite *const sprite = get_sprite(BULLET, Game_renderer);
+    set_field_memory(bullet.sprite, sprite);
     
-    bullet->rect = malloc( sizeof(SDL_Rect) );
-
-    return bullet;
+    Bullet *const heap_bullet = (Bullet *) malloc(sizeof(Bullet));
+    memcpy(heap_bullet, &bullet, sizeof(Bullet));
+    return heap_bullet;
 }
 
 void Bullet_update(Bullet *bullet) {

@@ -3,7 +3,7 @@
 #ifndef D_CLIENT_HANDLER
 #define D_CLIENT_HANDLER
 
-void Client_init();
+void Client_init(const char *server_ip);
 void Client_tick();
 void Client_quit();
 

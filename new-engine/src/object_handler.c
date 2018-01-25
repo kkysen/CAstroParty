@@ -9,10 +9,9 @@
 #include "object_handler.h"
 #include "client_handler.h"
 #include "input_handler.h"
-#include "bullet.h"
 
-#define OBJECT_HANDLER_PLAYER_BUFFER_SIZE 10
-#define OBJECT_HANDLER_BULLET_BUFFER_SIZE 64
+#define OBJECT_HANDLER_PLAYER_BUFFER_SIZE 1000
+#define OBJECT_HANDLER_BULLET_BUFFER_SIZE 6400
 
 // Game Object lists. Initialize all to NULL
 Player *ObjectHandler_players[OBJECT_HANDLER_PLAYER_BUFFER_SIZE] = {0};
@@ -92,11 +91,13 @@ void ObjectHandler_render() {
  *      Creates a new player object AND adds it to our game.
  *      Use this to make new players
  */
-Player *ObjectHandler_new_player(float x, float y, int server_id) {
-    Player *player = Player_create(x, y, server_id);
+Player *ObjectHandler_new_player(const Vector position, const int server_id) {
+    Player *player = Player_create(position, server_id);
     
     int i = 0;
-    while (ObjectHandler_players[i] != NULL) i++;
+    while (ObjectHandler_players[i] != NULL) {
+        i++;
+    }
     
     if (i >= OBJECT_HANDLER_PLAYER_BUFFER_SIZE) {
         printf("ERROR: Cannot create new player! Exceeded maximum player buffer size\n");
@@ -116,7 +117,9 @@ Bullet *ObjectHandler_new_bullet(const Vector position, const float angle) {
     Bullet *bullet = Bullet_create(position, angle);
     
     int i = 0;
-    while (ObjectHandler_bullets[i] != NULL) i++;
+    while (ObjectHandler_bullets[i] != NULL) {
+        i++;
+    }
     
     if (i >= OBJECT_HANDLER_BULLET_BUFFER_SIZE) {
         printf("ERROR: Cannot create new bullet! Exceeded maximum player buffer size\n");

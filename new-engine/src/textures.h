@@ -15,6 +15,7 @@ typedef enum {
     GREEN_PLAYER,
     PURPLE_PLAYER,
     RED_PLAYER,
+    BULLET,
     NUM_PLAYERS,
 } GameTexture;
 

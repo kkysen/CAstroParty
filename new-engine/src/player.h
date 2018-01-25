@@ -22,9 +22,12 @@ typedef struct {
         };
     };
     
-    float angle;
     float acceleration;
-    int server_index;
+    
+    float angle;
+    float angular_velocity;
+    
+    const int server_index;
     
     // Keyboard inputs
     bool button_turn;
@@ -32,14 +35,10 @@ typedef struct {
     // Whether we pressed the shoot key last time
     bool button_shoot_prev;
     
-    float angular_velocity;
-    
-    SDL_Rect *rect; // For visual purposes only
-    
-    const Sprite *sprite;
+    const Sprite sprite;
 } Player;
 
-Player *Player_create(float x, float y, int server_index);
+Player *Player_create(Vector position, int server_index);
 
 void Player_update(Player *player);
 
