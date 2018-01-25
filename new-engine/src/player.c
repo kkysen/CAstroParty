@@ -12,6 +12,8 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
+#define PLAYER_MAX_SPEED 4
+
 static GameTexture next_texture = BLUE_PLAYER;
 
 /** Player_create(x, y)
@@ -25,14 +27,15 @@ struct player *Player_create(float x, float y, int server_index) {
     p("calloced player");
     pp(player);
     
-    player->acceleration = 3;
+    player->acceleration = 0.3;
     player->x = x;
     player->y = y;
     player->server_index = server_index;
-    
+    player->angle = 180;
+
     player->button_turn = false;
     player->button_shoot = false;
-    
+
     player->vel_angle = 5;
 
     player->rect = malloc( sizeof(SDL_Rect) );
@@ -47,19 +50,29 @@ void Player_update(struct player *player) {
     if (player->button_turn) {
         player->angle += player->vel_angle;
     }
-    
+
     Vector position = player->position;
     Vector velocity = player->velocity;
-    
+
     const float angle = deg2rad(player->angle - 90.0f);
     const float acceleration = player->acceleration;
-    if (player->button_shoot) {
-        position.x += acceleration * cosf(angle);
-        position.y += acceleration * sinf(angle);
+    
+    velocity.x += acceleration * cosf(angle);
+    velocity.y += acceleration * sinf(angle);
+
+    float mag = Vector_magnitude(velocity);
+    if (mag != 0) {
+    float max_mag = mag;
+        clamp(max_mag, 0, PLAYER_MAX_SPEED);
+        Vector_i_scale(velocity, max_mag/mag);
     }
 
+    Vector_i_add(position, velocity);
+
+    //Vector_clamp(position, 0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+
     player->button_shoot_prev = player->button_shoot;
-    
+
     Vector center = player->sprite->center;
 
     const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -79,7 +92,7 @@ void Player_render(struct player *player) {
             0,
             0,
             255);
-    
+
     const Vector position = player->position;
     const Vector sprite_center = player->sprite->center;
     const SDL_Rect dest_rect = {
