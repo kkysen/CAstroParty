@@ -18,6 +18,7 @@ static const char *const texture_filenames[] = {
         "green.png",
         "purple.png",
         "red.png",
+        "red.png", // FIXME change to bullet.png once we have it
 };
 
 static Sprite sprites[arraylen(texture_filenames)] = {};

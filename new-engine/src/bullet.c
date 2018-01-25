@@ -40,10 +40,15 @@ void Bullet_render(Bullet *bullet) {
             255,
             0,
             255);
-
-    bullet->rect->x = bullet->x - 8;
-    bullet->rect->y = bullet->y - 8;
-    bullet->rect->w = 16;
-    bullet->rect->h = 16;
-    SDL_RenderDrawRect(Game_renderer, bullet->rect);
+    
+    const Vector position = bullet->position;
+    const Vector sprite_center = bullet->sprite.center;
+    const SDL_Rect dest_rect = {
+            .x = (int) (position.x - sprite_center.x),
+            .y = (int) (position.y - sprite_center.y),
+            .w = (int) sprite_center.x,
+            .h = (int) sprite_center.y,
+    };
+    
+    SDL_RenderDrawRect(Game_renderer, &dest_rect);
 }
