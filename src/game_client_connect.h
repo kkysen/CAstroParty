@@ -15,7 +15,7 @@
  * adds its own player,
  * and sends the new player to the server.
  *
- * @param game
+ * @param game the uninitialized client game
  * @param ip_port the IP address and port of the server to connect to to
  * @return -1 if error
  */

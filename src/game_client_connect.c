@@ -9,6 +9,8 @@
 #include "serialize/player_serialization.h"
 #include "util/sdl_utils.h"
 #include "client_init_input.h"
+#include "serialize/buffer.h"
+#include "player.h"
 
 static uint8_t MAX_PLAYER_CHOOSES = 100;
 
@@ -37,6 +39,16 @@ static int Game_client_add_own_player(Game *game, int socket_fd);
 
 static int Game_client_fork_server(Game *const game, const IpPort ip_port) {
     const int socket_fd = connect_to_socket(ip_port);
+    
+    if (send_acknowledgement(socket_fd) == -1) {
+        perror("send_acknowledgement(socket_fd)");
+        return -1;
+    }
+    if (check_acknowledgement(socket_fd) == -1) {
+        perror("check_acknowledgement(socket_fd)");
+        return -1;
+    }
+    
     Buffer server_game = recv_all(socket_fd);
     if (server_game.length == -1) {
         perror("recv_all(socket_fd)");
@@ -46,6 +58,7 @@ static int Game_client_fork_server(Game *const game, const IpPort ip_port) {
     
     // deserialization sets default values for a client
     Game_deserialize(game, &server_game);
+    free(server_game.data);
     return socket_fd;
 }
 
@@ -107,6 +120,12 @@ static int GameState_load_sprites(GameState *const state, SDL_Renderer *const re
 }
 
 static int Game_client_init_graphics(Game *const game) {
+    GameClient *const client = (GameClient *) realloc(game->client, sizeof(GameClient));
+    if (!client) {
+        perror("Malloc Failed: realloc(game->client, sizeof(GameClient))");
+        return -1;
+    }
+    
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         sdl_perror("SDL_Init(SDL_INIT_EVERYTHING)");
         if (str_contains(SDL_GetError(), "No available video device")) {
@@ -116,19 +135,21 @@ static int Game_client_init_graphics(Game *const game) {
         return -1;
     }
     
-    if (GameClient_init(game->client, game) == -1) {
+    if (GameClient_init(client, game) == -1) {
         sdl_perror("GameClient_init(game->client, game)");
         goto error;
     }
     
-    if (GameState_load_sprites(&game->state, game->client->renderer) == -1) {
+    if (GameState_load_sprites(&game->state, client->renderer) == -1) {
         perror("GameState_load_sprites(&game->state)");
         goto error;
     }
+    
+    set_field(game->client, client);
     return 0;
     
     error:
-    GameClient_destroy(game->client);
+    GameClient_destroy(client);
     SDL_Quit();
     return -1;
 }
@@ -137,25 +158,22 @@ static int Game_client_add_own_player_with_name_and_texture(
         Game *const game, const int socket_fd, const String name, const GameTexture texture) {
     Player *const own_player = Player_new(name, texture);
     
-    const Buffer serialized_player = Player_serialize(own_player);
+    Buffer serialized_player = Player_serialize(own_player);
     
     if (send_all(socket_fd, serialized_player) == -1) {
         perror("send_all(socket_fd, serialized_player)");
         goto error;
     }
-    
-    if (check_acknowledgement(socket_fd) == -1) {
-        perror("check_acknowledgement(socket_fd)");
-        goto error;
-    }
+    free(serialized_player.data);
+    serialized_player = {0};
     
     if (Game_add_player(game, own_player) == -1) {
         perror("Game_add_player(game, own_player)");
         goto error;
     }
     
-    memcpy((int *) &own_player->socket_fd, &socket_fd, sizeof(int));
-    memcpy((Player *) &game->state.own_player, own_player, sizeof(Player));
+    set_field(own_player->socket_fd, socket_fd);
+    set_field(game->state.own_player, own_player);
     return 0;
     
     error:

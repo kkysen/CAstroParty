@@ -154,3 +154,10 @@ Finished the functions for choosing the new player's texture and name
     except for the actual functions that read in input (now in client_init_input.h).
     These functions are repeatedly called until a unique name and texture are chosen.
 
+khyberS -- 2018-01-24 20:33:34
+Wrote all of Game_server_init(),
+    which starts a game server based on GameServerOptions.
+    The Game has to be allocated on the heap because it is shared across threads.
+    A new thread is created to listen for and accept new client connections,
+        and do the other side of Game_client_connect() with them in order to add them to the game.
+
