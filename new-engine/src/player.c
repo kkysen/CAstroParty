@@ -70,7 +70,6 @@ void Player_update(struct player *player) {
     // copy back to Player*
     player->position = position;
     player->velocity = velocity;
-    printf("p%d (%f, %f)\n", player->server_index, player->x, player->y);
 }
 
 void Player_render(struct player *player) {
