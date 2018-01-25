@@ -4,6 +4,8 @@
 #include "input_handler.h"
 #include "server_handler.h"
 
+#include <errno.h>
+#include <sys/errno.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
