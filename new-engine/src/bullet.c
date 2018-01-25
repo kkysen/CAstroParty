@@ -1,16 +1,19 @@
 
 #include "game.h"
 #include "bullet.h"
+#include "vector.h"
 
 /** Bullet_create(x, y)
  *
  *      Creates a new bullet object but does NOT add it to our game yet.
  *      Use Handler_new_bullet(x,y)
  */
-struct bullet *Bullet_create(float x, float y) {
+struct bullet *Bullet_create(Vector pos, float angle) {
     struct bullet *bullet = malloc( sizeof(struct bullet) );
-    bullet->x = x;
-    bullet->y = y;
+    bullet->pos = pos;
+
+    bullet->vel_x = 8.0f * cosf(angle);
+    bullet->vel_y = 8.0f * sinf(angle);
     
     bullet->rect = malloc( sizeof(SDL_Rect) );
 

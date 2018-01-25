@@ -1,5 +1,6 @@
 
 #include <SDL2/SDL.h>
+#include "vector.h"
 
 #ifndef D_BULLET
 #define D_BULLET
@@ -8,8 +9,20 @@
 #define BULLET_TIMER_TIMEOUT 180
 
 struct bullet {
-    float x; float y;
-    float vel_x; float vel_y;
+    union{
+        struct{
+	    float x;
+	    float y;
+	};
+	Vector pos;
+    };
+    union{
+        struct{
+	    float vel_x;
+	    float vel_y;
+	};
+	Vector vel;
+    };
     
     int timer; // Timer, increasing each frame
 
@@ -17,7 +30,7 @@ struct bullet {
 };
 
 
-struct bullet *Bullet_create(float x, float y);
+struct bullet *Bullet_create(Vector pos, float angle);
 void Bullet_update(struct bullet *bullet);
 void Bullet_render(struct bullet *bullet);
 
