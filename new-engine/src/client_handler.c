@@ -71,10 +71,10 @@ void Client_init(const char *const server_ip) {
     Client_unpacked_inputs = malloc(Client_server_total_number_of_clients * sizeof(struct Networking_unpacked_inputs));
     
     const Vector positions[] = {
-            {80,   80},
-            {1200, 80},
-            {80,   640},
-            {1200, 640},
+            Vector_new(80, 80),
+            Vector_new(1200, 80),
+            Vector_new(80, 640),
+            Vector_new(1200, 640),
     };
     
     // NOW we make our players!
