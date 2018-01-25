@@ -80,7 +80,18 @@ void Client_init(char *server_ip) {
     // NOW we make our players!
     int i = 0;
     for(; i < Client_server_total_number_of_clients; i++) {
-        ObjectHandler_new_player(50*i,100, i); // Arbitrarily place them here
+        if(i == 0){
+            ObjectHandler_new_player(80, 80, i); // Arbitrarily place them here
+        }
+	if(i == 1){
+            ObjectHandler_new_player(1200, 80, i); // Arbitrarily place them here
+        }
+	if(i == 2){
+            ObjectHandler_new_player(80, 640, i); // Arbitrarily place them here
+        }
+	if(i == 3){
+            ObjectHandler_new_player(1200, 640, i); // Arbitrarily place them here
+        }
     }
 }
 
