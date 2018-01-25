@@ -69,6 +69,7 @@ void Player_update(struct player *player) {
     // copy back to Player*
     player->position = position;
     player->velocity = velocity;
+    printf("p%d (%f, %f)\n", player->server_index, player->x, player->y);
 }
 
 void Player_render(struct player *player) {
@@ -79,7 +80,7 @@ void Player_render(struct player *player) {
             0,
             0,
             255);
-    
+
     const Vector position = player->position;
     const Vector sprite_center = player->sprite->center;
     const SDL_Rect dest_rect = {
