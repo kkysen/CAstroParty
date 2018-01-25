@@ -44,7 +44,7 @@ void remove_texture(const GameTexture texture_index) {
 }
 
 Sprite *get_sprite(GameTexture texture_index, SDL_Renderer *renderer) {
-    assert(texture_index < arraylen(sprites));
+    assert((size_t) texture_index < arraylen(sprites));
     if (sprites[texture_index].texture) {
         return sprites + texture_index;
     }
