@@ -28,7 +28,7 @@ struct Networking_player_packet {
  *      To be used by the CLIENT to UNPACK the server data
  */
 struct Networking_object_packet {
-    struct *Networking_player_packet players; // TODO: When sending to our socket, make it vary in size!
+    struct Networking_player_packet *players; // TODO: When sending to our socket, make it vary in size!
     unsigned short players_count;
 };
 
@@ -40,7 +40,7 @@ struct Networking_input_packet {
     bool key_accelerate;
     bool key_turn_left;
     bool key_shoot_prev;
-}
+};
 
 /** Networking_set_nth_bit( *value, index, setto )
  *      Sets the "index"th bit of "value" to "setto"
@@ -54,7 +54,7 @@ void Networking_set_nth_bit(short *value, short index, bool setto) {
 /** Networking_read_nth_bit( value, index )
  *      Gives you the "index"th bit of a given short
  */
-void Networking_read_nth_bit(short value, short index) {
+int Networking_read_nth_bit(short value, short index) {
     return (value >> index) & 1;
 }
 
@@ -66,14 +66,14 @@ short Networking_client_make_input_packet(bool key_accelerate, bool key_turn_lef
     short result = 0;
     Networking_set_nth_bit(&result, 0, key_accelerate);
     Networking_set_nth_bit(&result, 1, key_turn_left);
-    Networking_set_nth_but(&result, 2, key_shoot_prev);
+    Networking_set_nth_bit(&result, 2, key_shoot_prev);
     return result;
 }
 
 /** Networking_server_make_object_packet( players, player_count )
  *      Makes a packet for all of the objects that is sent to the server
  * /
-struct Networking_object_packet *Networking_server_make_object_packet(struct player **players, int player_count) {
+struct Networking_object_packet *Networking_server_make_object_packet(Player **players, int player_count) {
     struct Networking_object_packet *result = malloc(sizeof(struct Networking_object_packet));
 
     result->players_count = player_count;
@@ -97,7 +97,7 @@ struct Networking_object_packet *Networking_server_make_object_packet(struct pla
  *      Makes a char array packet for all of the objects that is sent to the server
  *      This packet is ready to be sent to the clients
  */
-char *Network_server_get_object_packet(struct player **players, int player_count) {
+char *Network_server_get_object_packet(Player **players, int player_count) {
     int player_size = sizeof(struct Networking_player_packet);
 
     char *result = malloc(

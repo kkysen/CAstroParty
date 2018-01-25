@@ -8,8 +8,8 @@
  *      Creates a new bullet object but does NOT add it to our game yet.
  *      Use Handler_new_bullet(x,y)
  */
-struct bullet *Bullet_create(Vector pos, float angle) {
-    struct bullet *bullet = malloc( sizeof(struct bullet) );
+Bullet *Bullet_create(Vector pos, float angle) {
+    Bullet *bullet = malloc( sizeof(Bullet) );
     bullet->pos = pos;
 
     bullet->vel_x = 8.0f * cosf(angle);
@@ -20,7 +20,7 @@ struct bullet *Bullet_create(Vector pos, float angle) {
     return bullet;
 }
 
-void Bullet_update(struct bullet *bullet) {
+void Bullet_update(Bullet *bullet) {
     bullet->timer++;
 
     bullet->x += bullet->vel_x;
@@ -28,7 +28,7 @@ void Bullet_update(struct bullet *bullet) {
     // TODO: Collision Checking with players
 }
 
-void Bullet_render(struct bullet *bullet) {
+void Bullet_render(Bullet *bullet) {
 
     SDL_SetRenderDrawColor(
             Game_renderer,

@@ -5,72 +5,71 @@
  */
 #include "player.h"
 #include "game.h"
-#include "input_handler.h"
 #include "util/sdl_utils.h"
-#include "vector.h"
 #include "bullet.h"
 
-#include <SDL2/SDL.h>
-#include <stdbool.h>
+#define PLAYER_MAX_SPEED 4
 
 static GameTexture next_texture = BLUE_PLAYER;
+
+Vector Player_direction(Player *const player) {
+    const float angle = deg2rad(player->angle - 90.0f);
+    return Vector_new(cosf(angle), sinf(angle));
+}
 
 /** Player_create(x, y)
  *
  *      Creates a new player object but does NOT add it to our game yet.
  *      Use Handler_new_player(x,y)
  */
-struct player *Player_create(float x, float y, int server_index) {
+Player *Player_create(float x, float y, int server_index) {
     p("callocing player");
-    struct player *player = calloc(1, sizeof(struct player) );
+    Player *player = calloc(1, sizeof(Player));
     p("calloced player");
     pp(player);
     
-    player->acceleration = 3;
+    player->acceleration = 0.3;
     player->x = x;
     player->y = y;
     player->server_index = server_index;
+    player->angle = 180;
     
     player->button_turn = false;
     player->button_shoot = false;
     
-    player->vel_angle = 5;
-
-    player->rect = malloc( sizeof(SDL_Rect) );
+    player->angular_velocity = 5;
+    
+    player->rect = malloc(sizeof(SDL_Rect));
     
     player->sprite = get_sprite(next_texture, Game_renderer);
     next_texture = (next_texture + 1) % NUM_PLAYERS;
-
+    
     return player;
 }
 
-void Player_update(struct player *player) {
+void Player_update(Player *player) {
     if (player->button_turn) {
-        player->angle += player->vel_angle;
+        player->angle += player->angular_velocity;
     }
     
     Vector position = player->position;
     Vector velocity = player->velocity;
     
-    const float angle = deg2rad(player->angle - 90.0f);
+    const Vector direction = Player_direction(player);
     const float acceleration = player->acceleration;
-    if (player->button_shoot) {
-        position.x += acceleration * cosf(angle);
-        position.y += acceleration * sinf(angle);
+    Vector_i_mul_add(velocity, direction, acceleration);
+    
+    const float norm = Vector_norm(velocity);
+    if (norm != 0) {
+        const float scale = clamped_max(norm, PLAYER_MAX_SPEED) / norm;
+        Vector_i_scale(velocity, scale);
     }
-
-    player->button_shoot_prev = player->button_shoot;
+    
+    Vector_i_add(position, velocity);
     
     Vector center = player->sprite->center;
-
     // performant, possibly branchless if optimized
-    const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
-    
-    clamp(position.x, center.x, window.x);
-    clamp(position.y, center.y, window.y);
-//    Vector_clamp(position,
-//                 center.x, center.y,
-//                 window.x - center.x, window.y - center.y);
+    Vector_clamp(position, center, window_size);
     
     // copy back to Player*
     player->position = position;
@@ -82,10 +81,12 @@ void Player_update(struct player *player) {
         Vector_i_add(bullet_position, player->position);
         Bullet_create(bullet_position, player->angle);
     }
+    
+    player->button_shoot_prev = player->button_shoot;
 }
 
-void Player_render(struct player *player) {
-
+void Player_render(Player *player) {
+    
     SDL_SetRenderDrawColor(
             Game_renderer,
             255,
@@ -121,7 +122,7 @@ void Player_render(struct player *player) {
  *      change the inputs in this player which makes
  *      it act upon those inputs in the "update" loop
  */
-void Player_update_keys(struct player *player, struct Networking_unpacked_inputs inputs) {
+void Player_update_keys(Player *player, struct Networking_unpacked_inputs inputs) {
     player->button_turn = inputs.is_turning;
     player->button_shoot = inputs.is_shooting;
 }

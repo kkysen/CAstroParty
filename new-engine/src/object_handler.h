@@ -2,13 +2,19 @@
 #ifndef D_OBJECT_HANDLER
 #define D_OBJECT_HANDLER
 
+#include "player.h"
+#include "bullet.h"
+
 // Main handler functions
 void ObjectHandler_init();
+
 void ObjectHandler_tick();
+
 void ObjectHandler_render();
 
 // Game Object creation functions
-struct player *ObjectHandler_new_player(double x, double y, int server_id);
-struct bullet *ObjectHandler_new_bullet(double x, double y);
+Player *ObjectHandler_new_player(float x, float y, int server_id);
+
+Bullet *ObjectHandler_new_bullet(float x, float y);
 
 #endif

@@ -56,9 +56,21 @@ float Vector_dist2(Vector vector1, Vector vector2);
 
 #define Vector_as_SDL_Point(vector) ((SDL_Point) {.x = (vector).x, .y = (vector).y})
 
+#define clamped_min(val, min) \
+    (fmaxf(val, min))
+
+#define clamped_max(val, max) \
+    (fminf(val, max))
+
+#define clamp_min(val, min) \
+    (val) = clamped_min(val, min)
+
+#define clamp_max(val, max) \
+    (val) = clamped_max(val, max)
+
 #define clamp(val, min, max) \
-    (val) = fmaxf(val, min); \
-    (val) = fminf(val, max)
+    clamp_min(val, min); \
+    clamp_max(val, max)
 
 #define Vector_clamp(vector, min, max) \
     clamp((vector).x, (min).x, (max).x); \

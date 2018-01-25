@@ -6,7 +6,7 @@
 #ifndef D_PLAYER
 #define D_PLAYER
 
-struct player {
+typedef struct {
     union {
         Vector position;
         struct {
@@ -25,24 +25,28 @@ struct player {
     float angle;
     float acceleration;
     int server_index;
-
+    
     // Keyboard inputs
     bool button_turn;
     bool button_shoot;
     // Whether we pressed the shoot key last time
     bool button_shoot_prev;
     
-    float vel_angle;
+    float angular_velocity;
     
     SDL_Rect *rect; // For visual purposes only
     
     const Sprite *sprite;
-};
+} Player;
 
-struct player *Player_create(float x, float y, int server_index);
-void Player_update(struct player *player);
-void Player_render(struct player *player);
+Player *Player_create(float x, float y, int server_index);
 
-void Player_update_keys(struct player *player, struct Networking_unpacked_inputs);
+void Player_update(Player *player);
+
+void Player_render(Player *player);
+
+void Player_update_keys(Player *player, struct Networking_unpacked_inputs);
+
+Vector Player_direction(Player *player);
 
 #endif
