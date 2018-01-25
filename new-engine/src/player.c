@@ -59,7 +59,7 @@ void Player_update(struct player *player) {
 
     player->button_shoot_prev = player->button_shoot;
     
-    Vector center = player->sprite->center;
+//    Vector center = player->sprite->center;
     
     // performant, possibly branchless if optimized
 //    Vector_clamp(position,
@@ -79,14 +79,8 @@ void Player_render(struct player *player) {
             0,
             0,
             255);
-
-//    player->rect->x = player->x;
-//    player->rect->y = player->y;
-//    player->rect->w = 64;
-//    player->rect->h = 64;
-//    SDL_RenderDrawRect(Game_renderer, player->rect);
     
-    const Vector position = Vector_new(player->x, player->y);
+    const Vector position = player->position;
     const Vector sprite_center = player->sprite->center;
     const SDL_Rect dest_rect = {
             .x = (int) (position.x - sprite_center.x),
