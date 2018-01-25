@@ -27,6 +27,8 @@ struct player *Player_create(float x, float y, int server_index) {
     
     player->button_turn = false;
     player->button_shoot = false;
+    
+    player->vel_angle = 5;
 
     player->rect = malloc( sizeof(SDL_Rect) );
     
@@ -39,6 +41,10 @@ struct player *Player_create(float x, float y, int server_index) {
 void Player_update(struct player *player) {
     if (player->button_shoot) {
         player->x += 2;
+    }
+    
+    if (player->button_turn) {
+        player->angle += player->vel_angle;
     }
 
     player->button_shoot_prev = player->button_shoot;
