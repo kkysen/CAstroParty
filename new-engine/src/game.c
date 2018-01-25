@@ -21,6 +21,8 @@ void Game_render();
 int Game_running = 0;
 SDL_Event Game_sdl_event;
 
+char *Game_client_ip;
+
 /* void Game_sdl_init()
  *  Init sdl elements (window and renderer)
  */
@@ -73,8 +75,9 @@ void Game_start(enum NetworkMode network_mode) {
         Game_sdl_init();
         ObjectHandler_init();
         InputHandler_init();
-
-        Client_init("127.0.0.1");
+        
+        // Connect to our server!
+        Client_init(Game_client_ip);
     }
 
     printf("Starting game loop\n");
@@ -201,14 +204,15 @@ int main(int argc, char **argv) {
 
     if (argc == 1) {
         printf("Starting client game\n");
+        Game_client_ip = "127.0.0.1";
         Game_start(NETWORK_MODE_CLIENT);
     } else {
         if (strcmp(argv[1], "-s") == 0) {
             printf("Starting server game\n");
             Game_start(NETWORK_MODE_SERVER);
         } else {
-            printf("Bad arrguments.");
-            printf("Either use no arguments or use the \"-s\" flag to make a server\n");
+            Game_client_ip = argv[1];
+            Game_start(NETWORK_MODE_CLIENT);
         }
     }
     Game_stop();
