@@ -19,7 +19,10 @@ static GameTexture next_texture = BLUE_PLAYER;
  *      Use Handler_new_player(x,y)
  */
 struct player *Player_create(float x, float y, int server_index) {
+    p("callocing player");
     struct player *player = calloc(1, sizeof(struct player) );
+    p("calloced player");
+    pp(player);
     
     player->acceleration = 3;
     player->x = x;
@@ -40,7 +43,6 @@ struct player *Player_create(float x, float y, int server_index) {
 }
 
 void Player_update(struct player *player) {
-    
     if (player->button_shoot) {
         player->x += player->acceleration * cosf(player->angle);
         player->y += player->acceleration * sinf(player->angle);
