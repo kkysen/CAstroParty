@@ -60,11 +60,12 @@ void Player_update(struct player *player) {
     player->button_shoot_prev = player->button_shoot;
     
 //    Vector center = player->sprite->center;
-    
-    // performant, possibly branchless if optimized
+//
+//    // performant, possibly branchless if optimized
+//    const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 //    Vector_clamp(position,
 //                 center.x, center.y,
-//                 WINDOW_WIDTH - center.x, WINDOW_HEIGHT - center.y);
+//                 window.x - center.x, window.y - center.y);
     
     // copy back to Player*
     player->position = position;

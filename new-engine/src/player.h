@@ -9,13 +9,17 @@
 struct player {
     union {
         Vector position;
-        float x;
-        float y;
+        struct {
+            float x;
+            float y;
+        };
     };
     union {
         Vector velocity;
-        float vel_x;
-        float vel_y;
+        struct {
+            float vel_x;
+            float vel_y;
+        };
     };
     
     float angle;
