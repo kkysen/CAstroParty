@@ -1,4 +1,5 @@
 #include "networking.h"
+#include "textures.h"
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
@@ -6,7 +7,9 @@
 #define D_PLAYER
 
 struct player {
-    float x; float y; float angle;
+    float x;
+    float y;
+    float angle;
     int server_index;
 
     // Keyboard inputs
@@ -19,6 +22,8 @@ struct player {
     float vel_angle;
     
     SDL_Rect *rect; // For visual purposes only
+    
+    const Sprite *sprite;
 };
 
 struct player *Player_create(float x, float y, int server_index);

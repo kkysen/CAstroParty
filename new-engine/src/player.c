@@ -10,6 +10,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
+static GameTexture next_texture = BLUE_PLAYER;
 
 /** Player_create(x, y)
  *
@@ -26,6 +27,9 @@ struct player *Player_create(float x, float y, int server_index) {
     player->button_shoot = false;
 
     player->rect = malloc( sizeof(SDL_Rect) );
+    
+    player->sprite = get_sprite(next_texture, Game_renderer);
+    next_texture = (next_texture + 1) % NUM_PLAYERS;
 
     return player;
 }

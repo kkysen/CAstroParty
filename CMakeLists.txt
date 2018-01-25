@@ -45,7 +45,54 @@ set(SOURCE_FILES
         src/obstacles.h
         src/textures.c
         src/textures.h
-        src/client.c src/client.h src/reaction.c src/reaction.h src/game_packet.c src/game_packet.h src/networking.c src/networking.h src/game2.c src/game2.h src/game_client_connect.c src/game_client_connect.h src/serialize/game_serialization.c src/serialize/game_serialization.h src/serialize/serialization.c src/serialize/serialization.h src/serialize/player_serialization.c src/serialize/player_serialization.h src/serialize/players_serialization.c src/serialize/players_serialization.h src/serialize/buffer.c src/serialize/buffer.h src/serialize/game_state_serialization.c src/serialize/game_state_serialization.h src/client_init_input.c src/client_init_input.h src/game_server_init.c src/game_server_init.h src/util/arg_parse.c src/util/arg_parse.h)
+        src/client.c
+        src/client.h
+        src/reaction.c
+        src/reaction.h
+        src/game_packet.c
+        src/game_packet.h
+        src/networking.c
+        src/networking.h
+        src/game2.c
+        src/game2.h
+        src/game_client_connect.c
+        src/game_client_connect.h
+        src/serialize/game_serialization.c
+        src/serialize/game_serialization.h
+        src/serialize/serialization.c
+        src/serialize/serialization.h
+        src/serialize/player_serialization.c
+        src/serialize/player_serialization.h
+        src/serialize/players_serialization.c
+        src/serialize/players_serialization.h
+        src/serialize/buffer.c
+        src/serialize/buffer.h
+        src/serialize/game_state_serialization.c
+        src/serialize/game_state_serialization.h
+        src/client_init_input.c
+        src/client_init_input.h
+        src/game_server_init.c
+        src/game_server_init.h
+        src/util/arg_parse.c
+        src/util/arg_parse.h
+        new-engine/legacy/networking.c
+        new-engine/src/client_handler.c
+        new-engine/src/client_handler.h
+        new-engine/src/game.c
+        new-engine/src/game.h
+        new-engine/src/input_handler.c
+        new-engine/src/input_handler.h
+        new-engine/src/networking.c
+        new-engine/src/networking.h
+        new-engine/src/object_handler.c
+        new-engine/src/object_handler.h
+        new-engine/src/player.c
+        new-engine/src/player.h
+        new-engine/src/server_handler.c
+        new-engine/src/server_handler.h
+        new-engine/src/textures.c
+        new-engine/src/textures.h
+        )
 
 add_executable(CAstroParty ${SOURCE_FILES})
 

@@ -165,7 +165,7 @@ static int Game_client_add_own_player_with_name_and_texture(
         goto error;
     }
     free(serialized_player.data);
-    serialized_player = {0};
+    serialized_player = (Buffer) {0};
     
     if (Game_add_player(game, own_player) == -1) {
         perror("Game_add_player(game, own_player)");

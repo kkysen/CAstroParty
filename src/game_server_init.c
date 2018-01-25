@@ -265,10 +265,10 @@ static Option game_server_options[] = {
 };
 
 int Game_server_main(const int argc, const char *const *const argv) {
-    _Static_assert(NUM_OPTION_TYPES == arraylen(game_server_options));
+    _Static_assert(NUM_OPTION_TYPES == arraylen(game_server_options), "Not all options are in game_server_options");
     Option options[NUM_OPTION_TYPES];
     for (uint32_t i = 0; i < NUM_OPTION_TYPES; ++i) {
-        options[game_server_options[i].type] = game_server_options[i];
+        memcpy(options + game_server_options[i].type, game_server_options + i, sizeof(Option));
     }
     const Options options_obj = {.options = options, .num_options = NUM_OPTION_TYPES};
     

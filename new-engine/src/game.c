@@ -7,6 +7,7 @@
 #include "input_handler.h"
 #include "client_handler.h"
 #include "server_handler.h"
+#include "textures.h"
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -206,7 +207,9 @@ void Game_stop() {
 // Leave arguments blank for client
 // add argument "-s" for server
 int main(int argc, char **argv) {
-
+    
+    destroy_all_textures_on_exit();
+    
     if (argc == 1) {
         printf("Starting client game\n");
         Game_client_ip = "127.0.0.1";
