@@ -141,9 +141,6 @@ void Game_tick() {
 
     // Handle SDL Events (keyboard input and window closing)
     while (SDL_PollEvent(&Game_sdl_event)) {
-        if(Game_sdl_event.type==SDL_MOUSEBUTTONDOWN){
-            printf("%d", Game_sdl_event.type);
-        } 
         switch(Game_sdl_event.type) {
             // Grab window events
             case SDL_WINDOWEVENT:
