@@ -6,6 +6,7 @@
 #include "player.h"
 #include "game.h"
 #include "input_handler.h"
+#include "util/sdl_utils.h"
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
@@ -56,6 +57,25 @@ void Player_render(struct player *player) {
     player->rect->w = 64;
     player->rect->h = 64;
     SDL_RenderDrawRect(Game_renderer, player->rect);
+    
+    const Vector position = Vector_new(player->x, player->y);
+    const Vector sprite_center = player->sprite->center;
+    const SDL_Rect dest_rect = {
+            .x = (int) (position.x - sprite_center.x),
+            .y = (int) (position.y - sprite_center.y),
+            .w = (int) sprite_center.x,
+            .h = (int) sprite_center.y,
+    };
+    SDL_Point center = Vector_as_SDL_Point(position);
+    sdl_warn_perror(SDL_RenderCopyEx(
+            Game_renderer,
+            player->sprite->texture,
+            NULL, // TODO change later
+            &dest_rect,
+            player->angle,
+            &center,
+            SDL_FLIP_NONE
+    ));
 }
 
 /** Player_update_keys( player, accel, left, shoot );

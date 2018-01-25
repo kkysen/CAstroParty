@@ -114,6 +114,14 @@ set(SOURCE_FILES
         new-engine/src/util/utils.h
         new-engine/src/util/arg_parse.c
         new-engine/src/util/arg_parse.h
+        new-engine/src/serialize/buffer.c
+        new-engine/src/serialize/buffer.h
+        new-engine/src/serialize/serialization.c
+        new-engine/src/serialize/serialization.h
+        new-engine/src/vector.c
+        new-engine/src/vector.h
+        new-engine/src/bullet.c
+        new-engine/src/bullet.h
         )
 
 add_executable(CAstroParty ${SOURCE_FILES})
