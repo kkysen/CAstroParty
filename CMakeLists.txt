@@ -92,6 +92,28 @@ set(SOURCE_FILES
         new-engine/src/server_handler.h
         new-engine/src/textures.c
         new-engine/src/textures.h
+        new-engine/src/util/sdl_colors.c
+        new-engine/src/util/sdl_colors.h
+        new-engine/src/util/sdl_utils.c
+        new-engine/src/util/sdl_utils.h
+        new-engine/src/util/hash.c
+        new-engine/src/util/hash.h
+        new-engine/src/util/io.c
+        new-engine/src/util/io.h
+        new-engine/src/util/random.c
+        new-engine/src/util/random.h
+        new-engine/src/util/sigaction.c
+        new-engine/src/util/sigaction.h
+        new-engine/src/util/sized_string.c
+        new-engine/src/util/sized_string.h
+        new-engine/src/util/string_builder.c
+        new-engine/src/util/string_builder.h
+        new-engine/src/util/string_utils.c
+        new-engine/src/util/string_utils.h
+        new-engine/src/util/utils.c
+        new-engine/src/util/utils.h
+        new-engine/src/util/arg_parse.c
+        new-engine/src/util/arg_parse.h
         )
 
 add_executable(CAstroParty ${SOURCE_FILES})
