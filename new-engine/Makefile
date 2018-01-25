@@ -29,6 +29,7 @@ $(BIN_DIR)/%.o: $(SRC_DIR)/%.c
 bin_dir_exists:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(BIN_DIR)/util
+	mkdir -p $(BIN_DIR)/serialize
 
 run: all
 	./$(PROGRAM_NAME)
