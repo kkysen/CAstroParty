@@ -11,15 +11,18 @@
 #include "client_handler.h"
 #include "input_handler.h"
 #include "player.h"
+#include "bullet.h"
 #include "game.h"
 
 #include<stdio.h>
 #include<stdlib.h>
 
 #define OBJECT_HANDLER_PLAYER_BUFFER_SIZE 10
+#define OBJECT_HANDLER_BULLET_BUFFER_SIZE 64
 
 // Game Object lists. Initialize all to NULL
 struct player *ObjectHandler_players[OBJECT_HANDLER_PLAYER_BUFFER_SIZE];
+struct bullet *ObjectHandler_bullets[OBJECT_HANDLER_BULLET_BUFFER_SIZE];
 
 /** ObjectHandler_init()
  *      Initialize every starting object in the game here
@@ -31,9 +34,8 @@ void ObjectHandler_init() {
     for(i = 0; i < OBJECT_HANDLER_PLAYER_BUFFER_SIZE; i++)
         ObjectHandler_players[i] = NULL;
 
-    // test
-    //ObjectHandler_new_player(100,100);
-
+    for(i = 0; i < OBJECT_HANDLER_BULLET_BUFFER_SIZE; i++)
+        ObjectHandler_bullets[i] = NULL;
 }
 
 /** ObjectHandler_tick()
@@ -60,6 +62,22 @@ void ObjectHandler_tick() {
         }
         i++;
     }
+    printf("Starting tick\n");
+    i = 0;
+    while(i < OBJECT_HANDLER_BULLET_BUFFER_SIZE) {
+        struct bullet *current_bullet = ObjectHandler_bullets[i];
+        if (current_bullet != NULL) {
+            Bullet_update(current_bullet);
+
+            // Clean up our bullet after a certain time
+            if (current_bullet->timer > BULLET_TIMER_TIMEOUT) {
+                free(current_bullet);
+                ObjectHandler_bullets[i] = NULL;
+            }
+        }
+        i++;
+    }
+    printf("Ending tick\n");
 }
 
 /** ObjectHandler_render()
@@ -75,9 +93,18 @@ void ObjectHandler_render() {
         i++;
     }
 
+    printf("Start render\n");
+    i = 0;
+    while(i < OBJECT_HANDLER_BULLET_BUFFER_SIZE) {
+        struct bullet *current_bullet = ObjectHandler_bullets[i];
+        if (current_bullet != NULL)
+            Bullet_render(current_bullet);
+        i++;
+    }
+    printf("End render\n");
 }
 
-/** ObjectHandler_new_player(x, y)
+/** ObjectHandler_new_player(x, y, server_id)
  *      Creates a new player object AND adds it to our game.
  *      Use this to make new players
  */
@@ -86,12 +113,33 @@ struct player *ObjectHandler_new_player(double x, double y, int server_id) {
 
     int i = 0;
     while(ObjectHandler_players[i] != NULL) i++;
+
     if (i >= OBJECT_HANDLER_PLAYER_BUFFER_SIZE) {
         printf("ERROR: Cannot create new player! Exceeded maximum player buffer size\n");
-        Game_stop();
+        exit(-1);
     }
 
     ObjectHandler_players[i] = player;
 
     return player;
+}
+
+/** ObjectHandler_new_bullet(x, y)
+ *      Creates a new bullet object AND adds it to our game.
+ *      Use this to make new bullets
+ */
+struct bullet *ObjectHandler_new_bullet(double x, double y) {
+    struct bullet *bullet = Bullet_create(x,y);
+    
+    int i = 0;
+    while(ObjectHandler_bullets[i] != NULL) i++;
+
+    if (i >= OBJECT_HANDLER_BULLET_BUFFER_SIZE) {
+        printf("ERROR: Cannot create new bullet! Exceeded maximum player buffer size\n");
+        exit(-1);
+    }
+
+    ObjectHandler_bullets[i] = bullet;
+
+    return bullet;
 }
