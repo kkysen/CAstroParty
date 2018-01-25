@@ -27,11 +27,10 @@ char util_read_nth_bit(char value, char index) {
 /* Networking_compress_inputs( is_accelerating, is_turning_left, is_shooting )
  *      Compresses our input data into a char, which we can send via networking
  */
-char Networking_compress_inputs(bool is_accelerating, bool is_turning_left, bool is_shooting) {
+char Networking_compress_inputs(bool is_turning, bool is_shooting) {
     char result = 0;
-    util_set_nth_bit(&result, 0, is_accelerating);
-    util_set_nth_bit(&result, 1, is_turning_left);
-    util_set_nth_bit(&result, 2, is_shooting);
+    util_set_nth_bit(&result, 0, is_turning);
+    util_set_nth_bit(&result, 1, is_shooting);
     return result;
 }
 
@@ -41,9 +40,8 @@ char Networking_compress_inputs(bool is_accelerating, bool is_turning_left, bool
 struct Networking_unpacked_inputs *Networking_decompress_inputs(char data) {
     struct Networking_unpacked_inputs *unpacked = malloc(sizeof(struct Networking_unpacked_inputs));
 
-    unpacked->is_accelerating = util_read_nth_bit(data, 0);
-    unpacked->is_turning_left = util_read_nth_bit(data, 1);
-    unpacked->is_shooting     = util_read_nth_bit(data, 2);
+    unpacked->is_turning = util_read_nth_bit(data, 0);
+    unpacked->is_shooting     = util_read_nth_bit(data, 1);
 
     return unpacked;
 }

@@ -10,11 +10,10 @@ struct player {
     int server_index;
 
     // Keyboard inputs
-    bool key_accelerate;
-    bool key_turn_left;
-    bool key_shoot;
+    bool button_turn;
+    bool button_shoot;
     // Whether we pressed the shoot key last time
-    bool key_shoot_prev;
+    bool button_shoot_prev;
 
     float vel_x; float vel_y;
     float vel_angle;

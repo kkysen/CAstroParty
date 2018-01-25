@@ -94,7 +94,7 @@ void Client_tick() {
     char send_buffer; // Sent to server
     char result[30];  // Received from server. 30 is arbitrary, we won't have 30+ clients
 
-    send_buffer = Networking_compress_inputs( InputHandler_key_accelerate, InputHandler_key_turn_left, InputHandler_key_shoot );
+    send_buffer = Networking_compress_inputs( InputHandler_button_turn, InputHandler_button_shoot );
 
     // If we've read something from the server
     if (read(Client_server_socket, result, sizeof(result)) > 1) {

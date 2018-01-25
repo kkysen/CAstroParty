@@ -137,6 +137,9 @@ void Game_tick() {
 
     // Handle SDL Events (keyboard input and window closing)
     while (SDL_PollEvent(&Game_sdl_event)) {
+        if(Game_sdl_event.type==SDL_MOUSEBUTTONDOWN){
+            printf("%d", Game_sdl_event.type);
+        } 
         switch(Game_sdl_event.type) {
             // Grab window events
             case SDL_WINDOWEVENT:
@@ -147,11 +150,13 @@ void Game_tick() {
                     break;
                 }
                 break;
-            case SDL_KEYDOWN:
-                InputHandler_press_key(Game_sdl_event.key.keysym.sym);
-                break;
-            case SDL_KEYUP:
-                InputHandler_release_key(Game_sdl_event.key.keysym.sym);
+            case SDL_MOUSEBUTTONDOWN:
+	        printf("Button down");
+	        InputHandler_press_button(Game_sdl_event.button.button);
+	        break;
+	    case SDL_MOUSEBUTTONUP:
+	        printf("Button up");
+                InputHandler_release_button(Game_sdl_event.button.button);
                 break;
         } 
     }
