@@ -19,7 +19,7 @@ struct player {
     float vel_x; float vel_y;
     float vel_angle;
     
-    SDL_Rect *rect;
+    SDL_Rect *rect; // For visual purposes only
 };
 
 struct player *Player_create(float x, float y, int server_index);
