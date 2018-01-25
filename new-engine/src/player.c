@@ -68,7 +68,7 @@ void Player_update(struct player *player) {
     Vector copy = position;
     clamp(copy.x, center.x, window.x - center.x);
     
-    if (game_tick % 10 == 0) {
+    if (copy.x < center.x) {
         pv(copy);
     }
     
