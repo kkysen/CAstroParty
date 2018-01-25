@@ -47,7 +47,7 @@ void Player_update(struct player *player) {
         player->angle += player->vel_angle;
     }
     
-    const float angle = deg2rad(player->angle + 90.0f);
+    const float angle = deg2rad(player->angle - 90.0f);
     const float acceleration = player->acceleration;
     if (player->button_shoot) {
         player->x += acceleration * cosf(angle);
