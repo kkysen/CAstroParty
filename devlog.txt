@@ -161,3 +161,9 @@ Wrote all of Game_server_init(),
     A new thread is created to listen for and accept new client connections,
         and do the other side of Game_client_connect() with them in order to add them to the game.
 
+khyberS -- 2018-01-25 01:27:55
+Added arg_parse.h in src/util, which parses command line arguments into an Options[].
+Wrote Game_server_main(), which is a main() function for the server,
+    which takes command line arguments for the
+    port, title, fps, width, height, and max num players.
+

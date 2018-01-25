@@ -11,6 +11,8 @@
 #include "networking.h"
 #include "serialize/game_serialization.h"
 #include "serialize/player_serialization.h"
+#include "util/utils.h"
+#include "util/arg_parse.h"
 
 static int GameServerOptions_check(const GameServerOptions *options);
 
@@ -207,7 +209,151 @@ int Game_server_init(Game *const game, const GameServerOptions *const options) {
     return 0;
 }
 
+typedef enum {
+    PORT = 0,
+    TITLE,
+    FPS,
+    WIDTH,
+    HEIGHT,
+    MAX_NUM_PLAYERS,
+    NUM_OPTION_TYPES
+} GameServerOptionType;
+
+static Option game_server_options[] = {
+        {
+                .type = PORT,
+                .name = "port",
+                .letter = 'p',
+                .required = OPTIONAL,
+                .has_arg = REQUIRED,
+        },
+        {
+                .type = TITLE,
+                .name = "title",
+                .letter = 't',
+                .required = REQUIRED,
+                .has_arg = REQUIRED,
+        },
+        {
+                .type = FPS,
+                .name = "fps",
+                .letter = 0,
+                .required = OPTIONAL,
+                .has_arg = REQUIRED,
+        },
+        {
+                .type = WIDTH,
+                .name = "width",
+                .letter = 'w',
+                .required = OPTIONAL,
+                .has_arg = REQUIRED,
+        },
+        {
+                .type = HEIGHT,
+                .name = "height",
+                .letter = 'h',
+                .required = OPTIONAL,
+                .has_arg = REQUIRED,
+        },
+        {
+                .type = MAX_NUM_PLAYERS,
+                .name = "max_num_players",
+                .letter = 'n',
+                .required = OPTIONAL,
+                .has_arg = REQUIRED,
+        },
+};
+
 int Game_server_main(const int argc, const char *const *const argv) {
-    // TODO
+    _Static_assert(NUM_OPTION_TYPES == arraylen(game_server_options));
+    Option options[NUM_OPTION_TYPES];
+    for (uint32_t i = 0; i < NUM_OPTION_TYPES; ++i) {
+        options[game_server_options[i].type] = game_server_options[i];
+    }
+    const Options options_obj = {.options = options, .num_options = NUM_OPTION_TYPES};
+    
+    if (parse_options(argc, argv, options_obj) == -1) {
+        return -1;
+    }
+    
+    const char *port = "3090"; // chosen randomly FIXME
+    if (options[PORT].found) {
+        port = options[PORT].value.chars;
+    }
+    
+    const char *title = "CAstro Party";
+    if (options[TITLE].found) {
+        title = options[TITLE].value.chars;
+    }
+    
+    uint8_t fps = 60;
+    if (options[FPS].found) {
+        const long long_fps = strtol(options[FPS].value.chars, NULL, 10);
+        if (long_fps <= 0) {
+            printf("--fps must be positive\n");
+            return -1;
+        }
+        if (long_fps > UINT8_MAX) {
+            printf("--fps must be less than %d\n", UINT8_MAX);
+            return -1;
+        }
+        fps = (uint8_t) long_fps;
+    }
+    
+    int width = 640;
+    if (options[WIDTH].found) {
+        const long long_width = strtol(options[WIDTH].value.chars, NULL, 10);
+        if (long_width <= 0) {
+            printf("--width must be positive\n");
+            return -1;
+        }
+        if (long_width > UINT16_MAX) {
+            printf("--width must be less than %d\n", UINT16_MAX);
+            return -1;
+        }
+        width = (int) long_width;
+    }
+    
+    int height = 640;
+    if (options[HEIGHT].found) {
+        const long long_height = strtol(options[HEIGHT].value.chars, NULL, 10);
+        if (long_height <= 0) {
+            printf("--height must be positive\n");
+            return -1;
+        }
+        if (long_height > UINT16_MAX) {
+            printf("--height must be less than %d\n", UINT16_MAX);
+            return -1;
+        }
+        height = (int) long_height;
+    }
+    
+    uint8_t max_num_players = UINT8_MAX;
+    if (options[MAX_NUM_PLAYERS].found) {
+        const long long_max_num_players = strtol(options[MAX_NUM_PLAYERS].value.chars, NULL, 10);
+        if (long_max_num_players <= 0) {
+            printf("--max_num_players must be positive\n");
+            return -1;
+        }
+        if (long_max_num_players > UINT8_MAX) {
+            printf("--max_num_players must be less than %d\n", UINT8_MAX);
+            return -1;
+        }
+        max_num_players = (uint8_t) long_max_num_players;
+    }
+    
+    const GameServerOptions parsed_options = {
+            .port = port,
+            .title = title,
+            .fps = fps,
+            .height = height,
+            .width = width,
+            .max_num_players = max_num_players,
+    };
+    
+    Game *const game = (Game *) malloc(sizeof(Game)); // must allocated on heap
+    Game_server_init(game, &parsed_options);
+    Game_run(game); // FIXME Game_run() needs to be updated
+    
     return 0;
 }

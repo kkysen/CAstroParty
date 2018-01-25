@@ -8,6 +8,13 @@
 
 const String INVALID_STRING = {.length = 0, .chars = NULL};
 
+String String_new(const char *const s) {
+    return (String) {
+            .chars = s,
+            .length = strlen(s),
+    };
+}
+
 int String_compare(const String s1, const String s2) {
     if (s1.length != s2.length) {
         return s1.length < s2.length ? -1 : 1;

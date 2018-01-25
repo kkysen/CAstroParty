@@ -15,6 +15,8 @@ typedef struct string {
 
 extern const String INVALID_STRING;
 
+String String_new(const char *s);
+
 int String_compare(String s1, String s2);
 
 bool String_equals(String s1, String s2);
