@@ -52,11 +52,11 @@ void Player_render(struct player *player) {
             0,
             255);
 
-    player->rect->x = player->x;
-    player->rect->y = player->y;
-    player->rect->w = 64;
-    player->rect->h = 64;
-    SDL_RenderDrawRect(Game_renderer, player->rect);
+//    player->rect->x = player->x;
+//    player->rect->y = player->y;
+//    player->rect->w = 64;
+//    player->rect->h = 64;
+//    SDL_RenderDrawRect(Game_renderer, player->rect);
     
     const Vector position = Vector_new(player->x, player->y);
     const Vector sprite_center = player->sprite->center;
@@ -76,6 +76,7 @@ void Player_render(struct player *player) {
             &center,
             SDL_FLIP_NONE
     ));
+    SDL_RenderDrawRect(Game_renderer, &dest_rect);
 }
 
 /** Player_update_keys( player, accel, left, shoot );
