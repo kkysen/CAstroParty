@@ -43,13 +43,15 @@ struct player *Player_create(float x, float y, int server_index) {
 }
 
 void Player_update(struct player *player) {
-    if (player->button_shoot) {
-        player->x += player->acceleration * cosf(player->angle);
-        player->y += player->acceleration * sinf(player->angle);
-    }
-    
     if (player->button_turn) {
         player->angle += player->vel_angle;
+    }
+    
+    const float angle = deg2rad(player->angle * 90f);
+    const float acceleration = player->acceleration;
+    if (player->button_shoot) {
+        player->x += acceleration * cosf(angle);
+        player->y += acceleration * sinf(angle);
     }
 
     player->button_shoot_prev = player->button_shoot;
