@@ -35,7 +35,7 @@ struct player *Player_create(float x, float y, int server_index) {
 
     player->button_turn = false;
     player->button_shoot = false;
-    
+
     player->vel_angle = 5;
 
     player->rect = malloc( sizeof(SDL_Rect) );
@@ -85,7 +85,8 @@ void Player_update(struct player *player) {
     if (copy.x < center.x) {
         pv(copy);
     }
-
+    
+    clamp(position.x, center.x, window.x - center.x);
 //    Vector_clamp(position,
 //                 center.x, center.y,
 //                 window.x - center.x, window.y - center.y);
