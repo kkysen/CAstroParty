@@ -21,6 +21,7 @@ static GameTexture next_texture = BLUE_PLAYER;
 struct player *Player_create(float x, float y, int server_index) {
     struct player *player = calloc(1, sizeof(struct player) );
     
+    player->acceleration = 3;
     player->x = x;
     player->y = y;
     player->server_index = server_index;
@@ -39,8 +40,10 @@ struct player *Player_create(float x, float y, int server_index) {
 }
 
 void Player_update(struct player *player) {
+    
     if (player->button_shoot) {
-        player->x += 2;
+        player->x += player->acceleration * cosf(player->angle);
+        player->y += player->acceleration * sinf(player->angle);
     }
     
     if (player->button_turn) {

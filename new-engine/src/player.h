@@ -10,6 +10,7 @@ struct player {
     float x;
     float y;
     float angle;
+    float acceleration;
     int server_index;
 
     // Keyboard inputs
