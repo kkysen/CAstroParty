@@ -122,6 +122,8 @@ set(SOURCE_FILES
         new-engine/src/vector.h
         new-engine/src/bullet.c
         new-engine/src/bullet.h
+        new-engine/src/util/stacktrace.c
+        new-engine/src/util/stacktrace.h
         )
 
 add_executable(CAstroParty ${SOURCE_FILES})

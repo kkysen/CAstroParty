@@ -8,6 +8,7 @@
 #include "client_handler.h"
 #include "server_handler.h"
 #include "textures.h"
+#include "util/stacktrace.h"
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -207,7 +208,7 @@ void Game_stop() {
 // Leave arguments blank for client
 // add argument "-s" for server
 int main(int argc, char **argv) {
-    
+    set_stack_trace_signal_handler();
     destroy_all_textures_on_exit();
     
     if (argc == 1) {
