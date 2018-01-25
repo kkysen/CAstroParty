@@ -47,14 +47,28 @@ void Player_update(struct player *player) {
         player->angle += player->vel_angle;
     }
     
+    Vector position = player->position;
+    Vector velocity = player->velocity;
+    
     const float angle = deg2rad(player->angle - 90.0f);
     const float acceleration = player->acceleration;
     if (player->button_shoot) {
-        player->x += acceleration * cosf(angle);
-        player->y += acceleration * sinf(angle);
+        position.x += acceleration * cosf(angle);
+        position.y += acceleration * sinf(angle);
     }
 
     player->button_shoot_prev = player->button_shoot;
+    
+    Vector center = player->sprite->center;
+    
+    // performant, possibly branchless if optimized
+    Vector_clamp(position,
+                 center.x, center.y,
+                 WINDOW_WIDTH - center.x, WINDOW_HEIGHT - center.y);
+    
+    // copy back to Player*
+    player->position = position;
+    player->velocity = velocity;
 }
 
 void Player_render(struct player *player) {

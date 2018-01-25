@@ -7,8 +7,17 @@
 #define D_PLAYER
 
 struct player {
-    float x;
-    float y;
+    union {
+        Vector position;
+        float x;
+        float y;
+    };
+    union {
+        Vector velocity;
+        float vel_x;
+        float vel_y;
+    };
+    
     float angle;
     float acceleration;
     int server_index;
@@ -18,8 +27,7 @@ struct player {
     bool button_shoot;
     // Whether we pressed the shoot key last time
     bool button_shoot_prev;
-
-    float vel_x; float vel_y;
+    
     float vel_angle;
     
     SDL_Rect *rect; // For visual purposes only
