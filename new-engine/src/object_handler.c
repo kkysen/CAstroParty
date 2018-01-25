@@ -61,7 +61,6 @@ void ObjectHandler_tick() {
         }
         i++;
     }
-    printf("Starting tick\n");
     i = 0;
     while(i < OBJECT_HANDLER_BULLET_BUFFER_SIZE) {
         struct bullet *current_bullet = ObjectHandler_bullets[i];
@@ -76,7 +75,7 @@ void ObjectHandler_tick() {
         }
         i++;
     }
-    printf("Ending tick\n");
+    
 }
 
 /** ObjectHandler_render()
@@ -92,7 +91,6 @@ void ObjectHandler_render() {
         i++;
     }
 
-    printf("Start render\n");
     i = 0;
     while(i < OBJECT_HANDLER_BULLET_BUFFER_SIZE) {
         struct bullet *current_bullet = ObjectHandler_bullets[i];
@@ -100,7 +98,6 @@ void ObjectHandler_render() {
             Bullet_render(current_bullet);
         i++;
     }
-    printf("End render\n");
 }
 
 /** ObjectHandler_new_player(x, y, server_id)
