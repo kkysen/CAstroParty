@@ -112,8 +112,8 @@ Player *ObjectHandler_new_player(float x, float y, int server_id) {
  *      Creates a new bullet object AND adds it to our game.
  *      Use this to make new bullets
  */
-Bullet *ObjectHandler_new_bullet(float x, float y) {
-    Bullet *bullet = Bullet_create(x, y);
+Bullet *ObjectHandler_new_bullet(const Vector position, const float angle) {
+    Bullet *bullet = Bullet_create(position, angle);
     
     int i = 0;
     while (ObjectHandler_bullets[i] != NULL) i++;
