@@ -16,10 +16,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#define OBJECT_HANDLER_PLAYER_BUFFER_SIZE 10
-
-// Game Object lists. Initialize all to NULL
-struct player *ObjectHandler_players[OBJECT_HANDLER_PLAYER_BUFFER_SIZE];
 
 /** ObjectHandler_init()
  *      Initialize every starting object in the game here
@@ -46,8 +42,13 @@ void ObjectHandler_tick() {
         struct player *current_player = ObjectHandler_players[i];
         if (current_player != NULL) {
             // If our client got new inputs, update them in the player
+
             if (Client_got_new_inputs) {
                 Player_update_keys(current_player, Client_unpacked_inputs[ current_player->server_index ]);
+            }
+
+            if (Client_got_new_data) {
+                Player_update_info(current_player, Client_unpacked_players[ current_player->server_index ]);
             }
 
             // If we're dealing with our own player, update it's keyboard inputs

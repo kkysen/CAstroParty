@@ -64,6 +64,10 @@ void Game_start(enum NetworkMode network_mode) {
 
     Game_network_mode = network_mode;
 
+    ObjectHandler_init();
+    InputHandler_init();
+
+    Client_init_unpacked_data(); // both server AND client
 
     if (Game_network_mode == NETWORK_MODE_SERVER) {
         Server_init(2);
@@ -71,8 +75,6 @@ void Game_start(enum NetworkMode network_mode) {
     } else {
         // Graphics and local objects
         Game_sdl_init();
-        ObjectHandler_init();
-        InputHandler_init();
 
         Client_init("127.0.0.1");
     }
@@ -127,31 +129,30 @@ void Game_tick() {
     // If we're the server, we're literally not simulating anything
     if (Game_network_mode == NETWORK_MODE_SERVER) {
         Server_tick();
-        return;
     } else {
+        // Handle SDL Events (keyboard input and window closing)
+        while (SDL_PollEvent(&Game_sdl_event)) {
+            switch(Game_sdl_event.type) {
+                // Grab window events
+                case SDL_WINDOWEVENT:
+                    switch (Game_sdl_event.window.event) {
+                        case SDL_WINDOWEVENT_CLOSE:
+                            Game_stop();
+                            exit(0);
+                        break;
+                    }
+                    break;
+                case SDL_KEYDOWN:
+                    InputHandler_press_key(Game_sdl_event.key.keysym.sym);
+                    break;
+                case SDL_KEYUP:
+                    InputHandler_release_key(Game_sdl_event.key.keysym.sym);
+                    break;
+            } 
+        }
         Client_tick();
     }
 
-    // Handle SDL Events (keyboard input and window closing)
-    while (SDL_PollEvent(&Game_sdl_event)) {
-        switch(Game_sdl_event.type) {
-            // Grab window events
-            case SDL_WINDOWEVENT:
-                switch (Game_sdl_event.window.event) {
-                    case SDL_WINDOWEVENT_CLOSE:
-                        Game_stop();
-                        exit(0);
-                    break;
-                }
-                break;
-            case SDL_KEYDOWN:
-                InputHandler_press_key(Game_sdl_event.key.keysym.sym);
-                break;
-            case SDL_KEYUP:
-                InputHandler_release_key(Game_sdl_event.key.keysym.sym);
-                break;
-        } 
-    }
 
 
     ObjectHandler_tick();

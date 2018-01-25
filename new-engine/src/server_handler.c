@@ -8,6 +8,9 @@
  */
 
 #include "server_handler.h"
+#include "client_handler.h"
+#include "networking.h"
+#include "object_handler.h"
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -19,11 +22,14 @@
 #include<netdb.h>
 #include<errno.h>
 
+#define SERVER_DATA_UPDATE_DELAY 12
+
 
 int Server_server_socket;
 int *Server_client_sockets; // List of clients
 int Server_number_of_clients;
 
+int Server_update_counter = 0; // Increments every tick
 
 // Initializes our server
 void Server_init(int num_clients) {
@@ -107,6 +113,8 @@ void Server_accept_connections() {
     for(; i < Server_number_of_clients; i++) {
         confirmation[0] = i;
         send(Server_client_sockets[i], confirmation, sizeof(confirmation), 0);
+
+        ObjectHandler_new_player(50*i,100, i); // Arbitrarily place them here
     }
     printf("All clients have connected!\n");
 }
@@ -115,28 +123,59 @@ void Server_accept_connections() {
  *  Receive input data from clients and send game data back to the clients
  */
 void Server_tick() { 
-    
+
     // Receive inputs
-    char buffer[Server_number_of_clients];
+    char buffer[1 + Server_number_of_clients];
+    buffer[0] = SERVER_NETWORKING_INPUT_ID; // Start our buffer with an identifier
+
+    // Each client has 2 char slots: An ID (see networking.h) and a compressed input
     int i = 0;
     for(; i < Server_number_of_clients; i++) {
-        // Todo: Check for reading null
-        int read_size = read( Server_client_sockets[i], &buffer[i], sizeof(buffer[i]) );
+        int read_size = read( Server_client_sockets[i], &buffer[i + 1], sizeof(buffer[i + 1]) );
         if (read_size == 0) {
-            buffer[i] = -1; // No-input!
+            buffer[i + 1] = -1; // No-input!
         }
     }
 
-    // Send the data to all clients
+    // Since we're simulating a client, update the client keys so we can update the player keys
+    Client_update_inputs(&buffer[1]);
+
+    /*
+
+    // Send input data to all clients
     i = 0;
     for(; i < Server_number_of_clients; i++) {
-        if (buffer[i] == -1) continue;
+        if (buffer[i + 1] == -1) continue;
 
         if (send(Server_client_sockets[i], buffer, sizeof(buffer), MSG_DONTWAIT) == -1) {
-            printf("Server Send to Client errorno %d\n", errno);
+            printf("Server Send to Client INPUT errorno %d\n", errno);
             exit(-1);
         }
     }
+    */
+    
+
+    if (Server_update_counter % SERVER_DATA_UPDATE_DELAY == 0) {
+        // Send object data to all clients
+        char data_buffer[1 + Server_number_of_clients * sizeof(struct Networking_unpacked_player)];
+        data_buffer[0] = SERVER_NETWORKING_DATA_ID;
+        // Copy all of our player data to our buffer
+        i = 0;
+        for(; i < Server_number_of_clients; i++) {
+            memcpy( &data_buffer[1 + i * sizeof(struct Networking_unpacked_player)], &ObjectHandler_players[i], sizeof(struct Networking_unpacked_player));
+        }
+        // Now send that data to every client
+        i = 0;
+        for(; i < Server_number_of_clients; i++) {
+            if (send(Server_client_sockets[i], data_buffer, sizeof(data_buffer), MSG_DONTWAIT) == -1) {
+                printf("Server Send to Client DATA errorno %d\n", errno);
+                exit(-1);
+            }
+        }
+    }
+
+
+    Server_update_counter++;
 }
 
 /** Server_quit()

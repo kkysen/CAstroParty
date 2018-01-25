@@ -26,6 +26,6 @@ struct player *Player_create(float x, float y, int server_index);
 void Player_update(struct player *player);
 void Player_render(struct player *player);
 
-void Player_update_keys(struct player *player, struct Networking_unpacked_inputs);
-
+void Player_update_keys(struct player *player, struct Networking_unpacked_inputs input);
+void Player_update_info(struct player *player, struct Networking_unpacked_player data);
 #endif

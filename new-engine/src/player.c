@@ -67,3 +67,13 @@ void Player_update_keys(struct player *player, struct Networking_unpacked_inputs
     player->key_turn_left =  inputs.is_turning_left;
     player->key_shoot =      inputs.is_shooting;
 }
+
+/** Player_update_info( player, data )
+ *      Updates our player data, straight from the server
+ */
+void Player_update_info(struct player *player, struct Networking_unpacked_player data) {
+    // future TODO: Interpolation (way later, dwai now)
+    player->x = data.x;
+    player->y = data.y;
+    player->angle = data.angle;
+}

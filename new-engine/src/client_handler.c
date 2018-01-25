@@ -74,14 +74,23 @@ void Client_init(char *server_ip) {
     }
     printf("Connected and verified with server! Server gave us the ID: %d\n", Client_player_index);
 
-    // Make our unpacked input list
-    Client_unpacked_inputs = malloc(Client_server_total_number_of_clients * sizeof(struct Networking_unpacked_inputs));
-
     // NOW we make our players!
     int i = 0;
     for(; i < Client_server_total_number_of_clients; i++) {
         ObjectHandler_new_player(50*i,100, i); // Arbitrarily place them here
     }
+}
+
+/** void Client_init_unpacked_data()
+ *      Initializes our client data, so we can hold our unpacked buffer data.
+ *
+ *      This data is read by the ObjectHandler to update all of our players
+ */
+void Client_init_unpacked_data() {
+    // Make our unpacked input and player list
+    Client_unpacked_inputs =  malloc(Client_server_total_number_of_clients * sizeof(struct Networking_unpacked_inputs));
+    Client_unpacked_players = malloc(Client_server_total_number_of_clients * sizeof(struct Networking_unpacked_player));
+    printf("init unpacked data...\n");
 }
 
 /** Client_tick()
@@ -92,22 +101,38 @@ void Client_init(char *server_ip) {
 void Client_tick() {
 
     char send_buffer; // Sent to server
-    char result[30];  // Received from server. 30 is arbitrary, we won't have 30+ clients
+    char result[256];  // Received from server. 256 is arbitrary.
 
     send_buffer = Networking_compress_inputs( InputHandler_key_accelerate, InputHandler_key_turn_left, InputHandler_key_shoot );
 
+    // Default state: No new inputs
+    Client_got_new_inputs = false;
+    Client_got_new_data = false;
+
     // If we've read something from the server
     if (read(Client_server_socket, result, sizeof(result)) > 1) {
-        Client_got_new_inputs = true;
+        
+        if (result[0] == SERVER_NETWORKING_INPUT_ID) {
+            Client_update_inputs(&result[1]);
+        } else if (result[0] == SERVER_NETWORKING_DATA_ID) {
+            Client_got_new_data = true;
 
-        // Fill in our unpacked list of inputs
-        int i = 0;
-        for(;i < Client_server_total_number_of_clients; i++) {
-            Client_unpacked_inputs[i] = *Networking_decompress_inputs(result[i]);
+            int byte_counter = 1; // Byte counter, iterating through all bytes in the data.
+                                  // The 1st byte is already read (skip through it)
+                                  //TODO: Use byte_counter for input too
+            int num_players = result[byte_counter++];
+
+            int player_counter = 0;
+            for(;player_counter < num_players; player_counter++) {
+                // Copy the memory of our result buffer into our player list
+                memcpy( &Client_unpacked_players[player_counter], &result[ byte_counter ], sizeof(struct Networking_unpacked_player));
+                byte_counter += sizeof(struct Networking_unpacked_player);
+            }
+        } else {
+            printf("Server sent bad code: %d\n", result[0]);
         }
-    } else {
-        Client_got_new_inputs = false;
     }
+
 
     // Send our buffer to the server
     if (send(Client_server_socket, &send_buffer, sizeof(send_buffer), MSG_DONTWAIT) == -1) {
@@ -133,6 +158,20 @@ void Client_tick() {
         buffer_response[size] = 0;
         printf("Got server response: %s\n", buffer_response);
     }*/
+}
+
+/** Client_update_inputs( data )
+ *      Updates the client inputs from a bunch of ordered input data
+ */
+void Client_update_inputs(char *data) {
+
+    Client_got_new_inputs = true;
+
+    // Fill in our unpacked list of inputs
+    int i = 0;
+    for(;i < Client_server_total_number_of_clients; i++) {
+        Client_unpacked_inputs[i] = *Networking_decompress_inputs(data[i]);
+    }
 }
 
 void Client_quit() {
