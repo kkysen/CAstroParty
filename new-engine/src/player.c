@@ -65,14 +65,8 @@ void Player_update(struct player *player) {
     // performant, possibly branchless if optimized
     const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
     
-    Vector copy = position;
-    clamp(copy.x, center.x, window.x - center.x);
-    pf(copy.x);
-    if (copy.x < center.x) {
-        pv(copy);
-    }
-    
     clamp(position.x, center.x, window.x - center.x);
+    clamp(position.y, center.y, window.y - center.y);
 //    Vector_clamp(position,
 //                 center.x, center.y,
 //                 window.x - center.x, window.y - center.y);
