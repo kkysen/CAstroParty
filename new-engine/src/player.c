@@ -72,6 +72,7 @@ void Player_update(struct player *player) {
         pv(copy);
     }
     
+    clamp(position.x, center.x, window.x - center.x);
 //    Vector_clamp(position,
 //                 center.x, center.y,
 //                 window.x - center.x, window.y - center.y);
