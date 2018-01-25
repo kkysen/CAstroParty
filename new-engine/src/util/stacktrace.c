@@ -254,6 +254,7 @@ static void stack_trace_signal_handler_posix(int signal, siginfo_t *siginfo, voi
         post_stack_trace();
     }
     stacktrace_level--;
+    *((char *) context) = 0;
     exit(EXIT_FAILURE);
 }
 
