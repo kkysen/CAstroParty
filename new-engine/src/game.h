@@ -10,6 +10,8 @@
 
 #define GAME_FPS 60
 
+extern uint64_t game_tick;
+
 // NetworkMode. Are we the server, or a client?
 enum NetworkMode { NETWORK_MODE_CLIENT, NETWORK_MODE_SERVER };
 

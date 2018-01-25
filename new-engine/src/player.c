@@ -7,6 +7,7 @@
 #include "game.h"
 #include "input_handler.h"
 #include "util/sdl_utils.h"
+#include "vector.h"
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
@@ -59,10 +60,18 @@ void Player_update(struct player *player) {
 
     player->button_shoot_prev = player->button_shoot;
     
-//    Vector center = player->sprite->center;
-//
-//    // performant, possibly branchless if optimized
-//    const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Vector center = player->sprite->center;
+
+    // performant, possibly branchless if optimized
+    const Vector window = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
+    
+    Vector copy = position;
+    clamp(copy.x, center.x, window.x - center.x);
+    
+    if (game_tick % 10 == 0) {
+        pv(copy);
+    }
+    
 //    Vector_clamp(position,
 //                 center.x, center.y,
 //                 window.x - center.x, window.y - center.y);
