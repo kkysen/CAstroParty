@@ -5,20 +5,18 @@
 #define D_INPUT_HANDLER
 
 // Hardcoded key inputs
-#define INPUT_KEY_ACCELERATE SDLK_UP
-#define INPUT_KEY_TURN_LEFT SDLK_LEFT
-#define INPUT_KEY_SHOOT SDLK_SPACE
+#define INPUT_BUTTON_TURN SDL_BUTTON_RIGHT
+#define INPUT_BUTTON_SHOOT SDL_BUTTON_LEFT
 
 // Whether we're pressing the key currently
-bool InputHandler_key_accelerate;
-bool InputHandler_key_turn_left;
-bool InputHandler_key_shoot;
+bool InputHandler_button_turn;
+bool InputHandler_button_shoot;
 
 
 void InputHandler_init();
 // Utility variables, handled in game loop
-void InputHandler_press_key(SDL_Keycode key);
-void InputHandler_release_key(SDL_Keycode key);
+void InputHandler_press_button(Uint8 key);
+void InputHandler_release_button(Uint8 key);
 /*void InputHandler_tick();
 
 // User variables, to be used throughout the game

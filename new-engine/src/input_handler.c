@@ -19,7 +19,6 @@
 
 // Previous keys (so we can tell whether we just pressed a key)
 /*
-bool InputHandler_key_accelerate_prev = false;
 bool InputHandler_key_turn_left_prev = false;
 bool InputHandler_key_shoot_prev = false;
 */
@@ -28,9 +27,8 @@ bool InputHandler_key_shoot_prev = false;
  *      Initializes input handler, setting all variables to false
  */
 void InputHandler_init() {
-    InputHandler_key_accelerate = false;
-    InputHandler_key_turn_left = false;
-    InputHandler_key_shoot = false;
+    InputHandler_button_turn = false;
+    InputHandler_button_shoot = false;
 }
 
 
@@ -38,16 +36,13 @@ void InputHandler_init() {
  *      Sets a key to true, so that we can say it's being held
  *
  */
-void InputHandler_press_key(SDL_Keycode key) {
-    switch (key) {
-        case INPUT_KEY_ACCELERATE:
-            InputHandler_key_accelerate = true;
+void InputHandler_press_button(Uint8 button) {
+    switch (button) {
+        case INPUT_BUTTON_TURN:
+            InputHandler_button_turn = true;
             break;
-        case INPUT_KEY_TURN_LEFT:
-            InputHandler_key_turn_left = true;
-            break;
-        case INPUT_KEY_SHOOT:
-            InputHandler_key_shoot = true;
+        case INPUT_BUTTON_SHOOT:
+            InputHandler_button_shoot = true;
             break;
     }
 }
@@ -56,16 +51,13 @@ void InputHandler_press_key(SDL_Keycode key) {
  *      Sets a key to false, so that we can say it's NOT being held
  *
  */
-void InputHandler_release_key(SDL_Keycode key) {
-    switch (key) {
-        case INPUT_KEY_ACCELERATE:
-            InputHandler_key_accelerate = false;
+void InputHandler_release_button(Uint8 button) {
+    switch (button) {
+        case INPUT_BUTTON_TURN:
+            InputHandler_button_turn = false;
             break;
-        case INPUT_KEY_TURN_LEFT:
-            InputHandler_key_turn_left = false;
-            break;
-        case INPUT_KEY_SHOOT:
-            InputHandler_key_shoot = false;
+        case INPUT_BUTTON_SHOOT:
+            InputHandler_button_shoot = false;
             break;
     }
 }

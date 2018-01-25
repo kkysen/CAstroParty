@@ -52,9 +52,8 @@ void ObjectHandler_tick() {
 
             // If we're dealing with our own player, update it's keyboard inputs
             if (i == Client_player_index) {
-                current_player->key_accelerate = InputHandler_key_accelerate;
-                current_player->key_turn_left =  InputHandler_key_turn_left;
-                current_player->key_shoot =      InputHandler_key_shoot;
+                current_player->button_turn =  InputHandler_button_turn;
+                current_player->button_shoot =      InputHandler_button_shoot;
             }
             Player_update(current_player);
         }

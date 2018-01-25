@@ -22,9 +22,8 @@ struct player *Player_create(float x, float y, int server_index) {
     player->y = y;
     player->server_index = server_index;
     
-    player->key_accelerate = false;
-    player->key_turn_left = false;
-    player->key_shoot = false;
+    player->button_turn = false;
+    player->button_shoot = false;
 
     player->rect = malloc( sizeof(SDL_Rect) );
 
@@ -32,11 +31,11 @@ struct player *Player_create(float x, float y, int server_index) {
 }
 
 void Player_update(struct player *player) {
-    if (player->key_shoot) {
+    if (player->button_shoot) {
         player->x += 2;
     }
 
-    player->key_shoot_prev = player->key_shoot;
+    player->button_shoot_prev = player->button_shoot;
 }
 
 void Player_render(struct player *player) {
@@ -63,7 +62,6 @@ void Player_render(struct player *player) {
  *      it act upon those inputs in the "update" loop
  */
 void Player_update_keys(struct player *player, struct Networking_unpacked_inputs inputs) {
-    player->key_accelerate = inputs.is_accelerating;
-    player->key_turn_left =  inputs.is_turning_left;
-    player->key_shoot =      inputs.is_shooting;
+    player->button_turn = inputs.is_turning;
+    player->button_shoot = inputs.is_shooting;
 }
