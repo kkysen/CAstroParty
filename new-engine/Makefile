@@ -1,11 +1,12 @@
 CC = gcc -ggdb -std=gnu99 -Wall -Werror -Wextra -O3 -march=native
 
+
 SRC_DIR = src
 BIN_DIR = bin
 
 PROGRAM_NAME = game.out
 
-CFLAGS = -lSDL2 -lSDL2main
+CFLAGS = -lSDL2 -lSDL2main -lSDL2_image -lm
 
 rwildcard = $(foreach d, $(wildcard $1*), $(call rwildcard, $d/, $2) $(filter $(subst *, %, $2), $d))
 
