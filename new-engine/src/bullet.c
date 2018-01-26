@@ -3,6 +3,7 @@
 #include "bullet.h"
 #include "vector.h"
 #include "serialize/buffer.h"
+#include "util/utils.h"
 
 /** Bullet_create(x, y)
  *
@@ -18,6 +19,10 @@ Bullet *Bullet_create(Vector position, float angle) {
     };
     const Sprite *const sprite = get_sprite(BULLET, Game_renderer);
     set_field_memory(bullet.sprite, sprite);
+    if (memcmp(sprite, &bullet.sprite, sizeof(bullet.sprite)) != 0) {
+        printf("bullet.sprite not loaded correctly");
+        exit(1);
+    }
     
     Bullet *const heap_bullet = (Bullet *) malloc(sizeof(Bullet));
     memcpy(heap_bullet, &bullet, sizeof(Bullet));
@@ -41,6 +46,7 @@ void Bullet_render(Bullet *bullet) {
             0,
             255);
     
+    pp(bullet);
     const Vector position = bullet->position;
     const Vector sprite_center = bullet->sprite.center;
     const SDL_Rect dest_rect = {
