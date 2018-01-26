@@ -50,6 +50,9 @@ void ObjectHandler_tick() {
         const float kill_zone2 = Vector_norm2(center);
         const Vector player_position = player->position;
         for (size_t j = 0; j < num_bullets; ++j) {
+            if (bullets[j]->player_server_index == player->server_index)
+                continue;
+
             const Vector bullet_position = bullets[j]->position;
             if (Vector_in_radius2(player_position, bullet_position, kill_zone2)) {
                 // kill player and bullet
@@ -58,7 +61,7 @@ void ObjectHandler_tick() {
                 break;
             }
         }
-        
+
         if (!player->alive) {
             free(player);
             // move last player to this spot

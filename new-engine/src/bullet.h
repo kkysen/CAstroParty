@@ -26,7 +26,9 @@ typedef struct {
     };
     
     int timer; // Timer, increasing each frame
-    
+
+    int player_server_index; // The server_id of the player that shot it
+
     const Sprite sprite;
 } Bullet;
 
