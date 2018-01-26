@@ -9,14 +9,15 @@
 #include "bullet.h"
 #include "serialize/buffer.h"
 #include "object_handler.h"
+#include "util/sdl_colors.h"
+#include "textures.h"
 
 #define PLAYER_MAX_SPEED 4
 
 static GameTexture next_texture = BLUE_PLAYER;
 
 Vector Player_direction(Player *const player) {
-    const float angle = deg2rad(player->angle - 90.0f);
-    return Vector_new(cosf(angle), sinf(angle));
+    return Vector_direction(player->angle);
 }
 
 /** Player_create(x, y)
@@ -38,7 +39,9 @@ Player *Player_create(const Vector position, const int server_index) {
             .sprite = {},
             .alive = true,
     };
-    const Sprite *const sprite = get_sprite(next_texture, Game_renderer);
+    Sprite *const sprite = get_sprite(next_texture, Game_renderer);
+    sprite->border_color = RED;
+    sprite->angle = player.angle;
     next_texture = (next_texture + 1) % NUM_PLAYERS;
     set_field_memory(player.sprite, sprite);
     
@@ -50,6 +53,7 @@ Player *Player_create(const Vector position, const int server_index) {
 void Player_update(Player *player) {
     if (player->button_turn) {
         player->angle += player->angular_velocity;
+        player->sprite.angle = player->angle;
     }
     
     Vector position = player->position;
@@ -86,33 +90,7 @@ void Player_update(Player *player) {
 }
 
 void Player_render(Player *player) {
-    
-    SDL_SetRenderDrawColor(
-            Game_renderer,
-            255,
-            0,
-            0,
-            255);
-    
-    const Vector position = player->position;
-    const Vector sprite_center = player->sprite.center;
-    const SDL_Rect dest_rect = {
-            .x = (int) (position.x - sprite_center.x),
-            .y = (int) (position.y - sprite_center.y),
-            .w = (int) sprite_center.x,
-            .h = (int) sprite_center.y,
-    };
-//    SDL_Point center = Vector_as_SDL_Point(position);
-    sdl_warn_perror(SDL_RenderCopyEx(
-            Game_renderer,
-            player->sprite.texture,
-            NULL,
-            &dest_rect,
-            player->angle,
-            NULL,
-            SDL_FLIP_NONE
-    ));
-    SDL_RenderDrawRect(Game_renderer, &dest_rect);
+    Sprite_draw(&player->sprite, player->position, Game_renderer);
 }
 
 /** Player_update_keys( player, accel, left, shoot );
