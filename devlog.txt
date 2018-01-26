@@ -199,3 +199,17 @@ Incorporate networking for bullets and incorporate bullets into the ObjectHandle
 (so bullets can be spawned)
 
 
+jawadulK -- 2017-12-23
+Created basic game objects like players and vectors and their functions
+
+jawadulK -- 2017-12-26
+Worked on design document
+
+jawadulK -- 2018-01-16
+Reverted to a working version and branched it off
+
+jawadulK -- 2017-12-25
+Edited inputs to be based off mouse events
+
+jawadulK -- 2017-12-25-6
+Several changes to game mechanics
