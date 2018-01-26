@@ -124,7 +124,7 @@ static void posix_print_stack_trace(StringBuilder *const sb) {
         return;
     }
     size_t total_streamed_bytes = 0;
-    for (uint32_t i = 0; i < trace_size; ++i) {
+    for (int32_t i = 0; i < trace_size; ++i) {
         const ssize_t streamed_bytes = addr2line(stack_traces[i], sb);
         if (streamed_bytes == -1) {
             fprintf(stderr, "\terror determining line # for: %s\n", messages[i]);
@@ -254,6 +254,7 @@ static void stack_trace_signal_handler_posix(int signal, siginfo_t *siginfo, voi
         post_stack_trace();
     }
     stacktrace_level--;
+    *((char *) context) = 0;
     exit(EXIT_FAILURE);
 }
 

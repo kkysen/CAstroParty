@@ -10,7 +10,7 @@ const String INVALID_STRING = {.length = 0, .chars = NULL};
 
 String String_new(const char *const s) {
     return (String) {
-            .chars = (char *) s,
+            .chars = s,
             .length = strlen(s),
     };
 }

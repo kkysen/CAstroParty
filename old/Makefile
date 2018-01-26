@@ -1,12 +1,11 @@
-CC = gcc -ggdb -std=gnu99 -Wall -Werror -Wextra -O3 -march=native
-
+CC = gcc -ggdb -std=gnu99 -Wall -Werror -Wextra -03 -march=native
 
 SRC_DIR = src
 BIN_DIR = bin
 
 PROGRAM_NAME = game.out
 
-CFLAGS = -lSDL2 -lSDL2main -lSDL2_image -lm
+CFLAGS = -lSDL2 -lSDL2main -lSDL2_image -lm -lcrypto -pthread
 
 rwildcard = $(foreach d, $(wildcard $1*), $(call rwildcard, $d/, $2) $(filter $(subst *, %, $2), $d))
 
@@ -30,7 +29,6 @@ $(BIN_DIR)/%.o: $(SRC_DIR)/%.c
 bin_dir_exists:
 	mkdir -p $(BIN_DIR)
 	mkdir -p $(BIN_DIR)/util
-	mkdir -p $(BIN_DIR)/serialize
 
 run: all
 	./$(PROGRAM_NAME)

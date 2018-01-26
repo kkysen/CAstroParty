@@ -12,6 +12,8 @@ typedef union {
     uint64_t bits;
 } Vector;
 
+extern const Vector Vector_ZERO;
+
 #define deg2rad(degrees) ((degrees) * (float) M_PI / 180)
 
 #define rad2deg(radians) ((radians) * 180 / (float) M_PI)
@@ -52,17 +54,35 @@ float Vector_dist2(Vector vector1, Vector vector2);
 
 #define Vector_dist(vector1, vector2) sqrtf(Vector_dist2(vector1, vector2))
 
-#define Vector_in_radius(vector1, vector2, radius) Vector_dist(vector1, vector2) < (radius) * (radius)
+#define Vector_in_radius2(vector1, vector2, radius2) Vector_dist2(vector1, vector2) < radius2
+
+#define Vector_in_radius(vector1, vector2, radius) Vector_in_radius2(vector1, vector2, (radius) * (radius))
+
+Vector Vector_direction(float degrees);
 
 #define Vector_as_SDL_Point(vector) ((SDL_Point) {.x = (vector).x, .y = (vector).y})
 
-#define clamp(val, min, max) \
-    (val) = fmaxf(val, min); \
-    (val) = fminf(val, max)
+#define clamped_min(val, min) \
+    (fmaxf(val, min))
 
-#define Vector_clamp(vector, min_x, min_y, max_x, max_y) \
-    clamp((vector).x, min_x, max_x); \
-    clamp((vector).y, min_y, max_y)
+#define clamped_max(val, max) \
+    (fminf(val, max))
+
+#define clamp_min(val, min) \
+    (val) = clamped_min(val, min)
+
+#define clamp_max(val, max) \
+    (val) = clamped_max(val, max)
+
+#define clamp(val, min, max) \
+    clamp_min(val, min); \
+    clamp_max(val, max)
+
+#define Vector_clamp(vector, min, max) \
+    clamp((vector).x, (min).x, (max).x); \
+    clamp((vector).y, (min).y, (max).y)
+
+Vector Vector_random(Vector min, Vector max);
 
 #define pv(vector) printf(#vector": (%f, %f)\n", (vector).x, (vector).y)
 

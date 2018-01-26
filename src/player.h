@@ -1,49 +1,53 @@
-#ifndef CASTROPARTY_PLAYER_H
-#define CASTROPARTY_PLAYER_H
-
-#include <stdbool.h>
-#include <SDL2/SDL.h>
-
-#include "vector.h"
+#include "networking.h"
 #include "textures.h"
-#include "util/sized_string.h"
+#include <SDL2/SDL.h>
+#include <stdbool.h>
 
-#define ACCELERATION 0.166666666666f
-#define ANGULAR_VELOCITY 6
-#define MAX_SPEED_FACTOR 0.6666666666666f
+#ifndef D_PLAYER
+#define D_PLAYER
 
 typedef struct {
-    uint8_t id;
-    const String name;
+    union {
+        Vector position;
+        struct {
+            float x;
+            float y;
+        };
+    };
+    union {
+        Vector velocity;
+        struct {
+            float vel_x;
+            float vel_y;
+        };
+    };
+    
+    float acceleration;
+    
+    float angle;
+    float angular_velocity;
+    
+    const size_t server_index;
+    
+    // Keyboard inputs
+    bool button_turn;
+    bool button_shoot;
+    // Whether we pressed the shoot key last time
+    bool button_shoot_prev;
+    
     Sprite sprite;
-    Vector position;
-    Vector velocity;
-    float orientation;
-    char ammo; // TODO why is this a char?
-    const bool is_own;
-    const int socket_fd;
+    
+    bool alive;
 } Player;
 
-#include "game.h"
+Player *Player_create(Vector position, size_t server_index);
 
-Player *Player_new(String name, GameTexture texture);
+void Player_update(Player *player);
 
-/**
- * Place player in the world.
- *
- * @param player
- * @param position
- * @param orientation
- * @param ammo
- */
-void Player_spawn(Player *player, Vector position, float orientation, char ammo);
+void Player_render(Player *player);
 
-bool Player_in_radius(const Player *player, Vector position, float radius);
+void Player_update_keys(Player *player, struct Networking_unpacked_inputs);
 
-void Player_update(Player *player, GameState *state, float delta_time);
+Vector Player_direction(Player *player);
 
-void Player_render(const Player *player, const GameState *state, SDL_Renderer *renderer);
-
-uint64_t Player_hash(const Player *player);
-
-#endif // CASTROPARTY_PLAYER_H
+#endif

@@ -66,7 +66,6 @@ void init_home();
 #define pp(var) printf(#var": %p\n", var)
 #define pb(var) printf(#var": %s\n", (var) ? "true" : "false")
 #define pc(var) printf(#var": %c\n", (char) (var))
-#define pf(var) printf(#var": %f\n", (double) (var))
 
 #define _perror(strerror_call, s) \
     fprintf(stderr, \

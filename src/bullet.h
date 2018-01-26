@@ -1,16 +1,40 @@
-//
-// Created by kkyse on 12/25/2017.
-//
 
-#ifndef CASTROPARTY_BULLET_H
-#define CASTROPARTY_BULLET_H
+#include <SDL2/SDL.h>
+#include "vector.h"
+#include "textures.h"
 
-#include "player.h"
+#ifndef D_BULLET
+#define D_BULLET
+
+// Number of frames before a bullet gets deleted
+#define BULLET_TIMER_TIMEOUT 180
 
 typedef struct {
-    Player *const owner;
-    Vector position;
-    const Vector velocity;
+    union {
+        Vector position;
+        struct {
+            float x;
+            float y;
+        };
+    };
+    union {
+        Vector velocity;
+        struct {
+            float vel_x;
+            float vel_y;
+        };
+    };
+    
+    int timer; // Timer, increasing each frame
+    
+    const Sprite sprite;
 } Bullet;
 
-#endif // CASTROPARTY_BULLET_H
+
+Bullet *Bullet_create(Vector position, float angle);
+
+void Bullet_update(Bullet *bullet);
+
+void Bullet_render(Bullet *bullet);
+
+#endif
