@@ -56,6 +56,8 @@ float Vector_dist2(Vector vector1, Vector vector2);
 
 #define Vector_in_radius(vector1, vector2, radius) Vector_in_radius2(vector1, vector2, (radius) * (radius))
 
+Vector Vector_direction(float degrees);
+
 #define Vector_as_SDL_Point(vector) ((SDL_Point) {.x = (vector).x, .y = (vector).y})
 
 #define clamped_min(val, min) \

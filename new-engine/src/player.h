@@ -35,7 +35,7 @@ typedef struct {
     // Whether we pressed the shoot key last time
     bool button_shoot_prev;
     
-    const Sprite sprite;
+    Sprite sprite;
     
     bool alive;
 } Player;

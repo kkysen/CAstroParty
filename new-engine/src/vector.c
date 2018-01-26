@@ -21,3 +21,8 @@ inline float Vector_dist2(const Vector vector1, const Vector vector2) {
     const float dy = vector1.y - vector2.y;
     return dx * dx + dy * dy;
 }
+
+inline Vector Vector_direction(float degrees) {
+    const float angle = deg2rad(degrees - 90.0f);
+    return Vector_new(cosf(angle), sinf(angle));
+}
