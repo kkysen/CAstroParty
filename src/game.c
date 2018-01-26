@@ -10,7 +10,7 @@
 #include "textures.h"
 #include "util/stacktrace.h"
 
-void Game_start();
+void Game_start(enum NetworkMode network_mode);
 
 void Game_sdl_init();
 
@@ -68,7 +68,7 @@ void Game_sdl_init() {
 /* void Game_start()
  *  Starts the game: Initializes everything, then runs the main loop
  */
-void Game_start(enum NetworkMode network_mode) {
+void Game_start(const enum NetworkMode network_mode) {
     
     Game_network_mode = network_mode;
     

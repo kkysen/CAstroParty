@@ -167,7 +167,6 @@ Wrote Game_server_main(), which is a main() function for the server,
     which takes command line arguments for the
     port, title, fps, width, height, and max num players.
 
-
 adrisJ -- 2018-01-12
 Write SDL Example of creating a window that can be drawn in
 
@@ -198,7 +197,6 @@ adrisJ -- 2018-01-25
 Incorporate networking for bullets and incorporate bullets into the ObjectHandler
 (so bullets can be spawned)
 
-
 jawadulK -- 2017-12-23
 Created basic game objects like players and vectors and their functions
 
@@ -208,8 +206,17 @@ Worked on design document
 jawadulK -- 2018-01-16
 Reverted to a working version and branched it off
 
-jawadulK -- 2017-12-25
+jawadulK -- 2017-1-25
 Edited inputs to be based off mouse events
 
-jawadulK -- 2017-12-25-6
+jawadulK -- 2017-1-25-6
 Several changes to game mechanics
+
+khyberS -- 2017-1-25
+Added sprites,
+    better rendering,
+    clamping to the screen's edges,
+and lots of debugging.
+
+khyberS -- 2017-1-26
+Implemented middle click as a game restart button.
