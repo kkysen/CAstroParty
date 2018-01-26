@@ -9,9 +9,10 @@
 struct Networking_unpacked_inputs {
     bool is_turning;
     bool is_shooting;
+    bool restart;
 };
 
-char Networking_compress_inputs(bool is_turning, bool is_shooting);
+char Networking_compress_inputs(bool is_turning, bool is_shooting, bool restart);
 
 struct Networking_unpacked_inputs *Networking_decompress_inputs(char data);
 

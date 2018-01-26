@@ -12,6 +12,8 @@ typedef union {
     uint64_t bits;
 } Vector;
 
+extern const Vector Vector_ZERO;
+
 #define deg2rad(degrees) ((degrees) * (float) M_PI / 180)
 
 #define rad2deg(radians) ((radians) * 180 / (float) M_PI)
@@ -79,6 +81,8 @@ Vector Vector_direction(float degrees);
 #define Vector_clamp(vector, min, max) \
     clamp((vector).x, (min).x, (max).x); \
     clamp((vector).y, (min).y, (max).y)
+
+Vector Vector_random(Vector min, Vector max);
 
 #define pv(vector) printf(#vector": (%f, %f)\n", (vector).x, (vector).y)
 

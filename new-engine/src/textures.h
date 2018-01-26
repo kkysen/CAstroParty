@@ -27,6 +27,7 @@ typedef struct {
     const int width;
     const int height;
     const Vector center;
+    const float kill_zone2;
     float angle;
 } Sprite;
 

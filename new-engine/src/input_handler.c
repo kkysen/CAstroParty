@@ -29,6 +29,7 @@ bool InputHandler_key_shoot_prev = false;
 void InputHandler_init() {
     InputHandler_button_turn = false;
     InputHandler_button_shoot = false;
+    InputHandler_button_restart = false;
 }
 
 
@@ -44,6 +45,8 @@ void InputHandler_press_button(Uint8 button) {
         case INPUT_BUTTON_SHOOT:
             InputHandler_button_shoot = true;
             break;
+        case INPUT_BUTTON_RESTART:
+            InputHandler_button_restart = true;
     }
 }
 
@@ -59,6 +62,8 @@ void InputHandler_release_button(Uint8 button) {
         case INPUT_BUTTON_SHOOT:
             InputHandler_button_shoot = false;
             break;
+        case INPUT_BUTTON_RESTART:
+            InputHandler_button_restart = false;
     }
 }
 

@@ -25,7 +25,7 @@ Vector Player_direction(Player *const player) {
  *      Creates a new player object but does NOT add it to our game yet.
  *      Use Handler_new_player(x,y)
  */
-Player *Player_create(const Vector position, const int server_index) {
+Player *Player_create(const Vector position, const size_t server_index) {
     const Player player = {
             .position = position,
             .velocity = Vector_new(0, 0),

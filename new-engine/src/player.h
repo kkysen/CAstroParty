@@ -27,7 +27,7 @@ typedef struct {
     float angle;
     float angular_velocity;
     
-    const int server_index;
+    const size_t server_index;
     
     // Keyboard inputs
     bool button_turn;
@@ -40,7 +40,7 @@ typedef struct {
     bool alive;
 } Player;
 
-Player *Player_create(Vector position, int server_index);
+Player *Player_create(Vector position, size_t server_index);
 
 void Player_update(Player *player);
 

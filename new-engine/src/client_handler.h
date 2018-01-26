@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+extern size_t num_clients;
+
 void Client_init(const char *server_ip);
 
 void Client_tick();

@@ -7,10 +7,12 @@
 // Hardcoded key inputs
 #define INPUT_BUTTON_TURN SDL_BUTTON_RIGHT
 #define INPUT_BUTTON_SHOOT SDL_BUTTON_LEFT
+#define INPUT_BUTTON_RESTART SDL_BUTTON_MIDDLE // FIXME
 
 // Whether we're pressing the key currently
 bool InputHandler_button_turn;
 bool InputHandler_button_shoot;
+bool InputHandler_button_restart;
 
 
 void InputHandler_init();

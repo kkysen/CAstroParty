@@ -12,6 +12,8 @@
 #include "player.h"
 #include "bullet.h"
 #include "textures.h"
+#include "util/utils.h"
+#include "game.h"
 
 #define MAX_NUM_PLAYERS 1000
 #define MAX_NUM_BULLETS 6400
@@ -27,14 +29,41 @@ static size_t num_bullets = 0;
  *      Initialize every starting object in the game here
  *      as well as any handler variables
  */
-void ObjectHandler_init() {
-    // set them to NULL by = {0}
+void ObjectHandler_init(const size_t num_clients) {
+    const Vector positions[] = {
+            Vector_new(80, 80),
+            Vector_new(1200, 80),
+            Vector_new(80, 640),
+            Vector_new(1200, 640),
+    };
+    
+    size_t i = 0;
+    for (; i < min(num_clients, arraylen(positions)); ++i) {
+        ObjectHandler_new_player(positions[i], i);
+    }
+    if (i == num_clients) {
+        return;
+    }
+    
+    const Vector min_border = Vector_scale(window_size, 0.1f);
+    const Vector max_border = Vector_add(window_size, Vector_scale(min_border, -1));
+    for (; i < num_clients; ++i) {
+        ObjectHandler_new_player(Vector_random(min_border, max_border), i);
+    }
 }
 
 /** ObjectHandler_tick()
  *      Ticks all of our objects (called at every frame)
  */
 void ObjectHandler_tick() {
+    if (InputHandler_button_restart) {
+        memset(players, 0, sizeof(*players) * num_players);
+        memset(bullets, 0, sizeof(*bullets) * num_bullets);
+        num_players = 0;
+        num_bullets = 0;
+        ObjectHandler_init(num_clients);
+    }
+    
     for (size_t i = 0; i < num_players; ++i) {
         Player *const player = players[i];
         if (Client_got_new_inputs) {
@@ -47,7 +76,8 @@ void ObjectHandler_tick() {
         Player_update(player);
     
         const Vector center = player->sprite.center;
-        const float kill_zone2 = Vector_norm2(center);
+        const float kill_zone2 = player->sprite.kill_zone2;
+        //const float kill_zone2 = Vector_norm2(center); // might be too big
         const Vector player_position = player->position;
         for (size_t j = 0; j < num_bullets; ++j) {
             const Vector bullet_position = bullets[j]->position;
@@ -98,7 +128,7 @@ void ObjectHandler_render() {
  *      Creates a new player object AND adds it to our game.
  *      Use this to make new players
  */
-Player *ObjectHandler_new_player(const Vector position, const int server_id) {
+Player *ObjectHandler_new_player(const Vector position, const size_t server_id) {
     if (num_players == MAX_NUM_PLAYERS) {
         printf("ERROR: Cannot create new player! Exceeded maximum player buffer size\n");
         return NULL;

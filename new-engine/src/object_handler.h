@@ -6,14 +6,14 @@
 #include "bullet.h"
 
 // Main handler functions
-void ObjectHandler_init();
+void ObjectHandler_init(size_t num_clients);
 
 void ObjectHandler_tick();
 
 void ObjectHandler_render();
 
 // Game Object creation functions
-Player *ObjectHandler_new_player(Vector position, int server_id);
+Player *ObjectHandler_new_player(Vector position, size_t server_id);
 
 Bullet *ObjectHandler_new_bullet(Vector position, float angle);
 

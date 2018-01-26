@@ -79,7 +79,6 @@ void Game_start(enum NetworkMode network_mode) {
     } else {
         // Graphics and local objects
         Game_sdl_init();
-        ObjectHandler_init();
         InputHandler_init();
         
         // Connect to our server!
@@ -150,7 +149,6 @@ void Game_tick() {
                     case SDL_WINDOWEVENT_CLOSE:
                         Game_stop();
                         exit(0);
-                        break;
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
