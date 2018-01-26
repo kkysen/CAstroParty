@@ -64,12 +64,12 @@ void Client_init(const char *const server_ip) {
     while (1) {
         // If we've actually received something
         if (read(Client_server_socket, result, 2) > 1) {
-            Client_player_index = result[0];
+            Client_player_index = (size_t) result[0];
             Client_server_total_number_of_clients = result[1];
             break;
         }
     }
-    printf("Connected and verified with server! Server gave us the ID: %d\n", Client_player_index);
+    printf("Connected and verified with server! Server gave us the ID: %zd\n", Client_player_index);
     
     // Make our unpacked input list
     Client_unpacked_inputs = malloc(Client_server_total_number_of_clients * sizeof(struct Networking_unpacked_inputs));
