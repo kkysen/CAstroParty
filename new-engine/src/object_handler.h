@@ -12,6 +12,8 @@ void ObjectHandler_tick();
 
 void ObjectHandler_render();
 
+void ObjectHandler_restart();
+
 // Game Object creation functions
 Player *ObjectHandler_new_player(Vector position, size_t server_id);
 

@@ -56,14 +56,15 @@ void ObjectHandler_init(const size_t num_clients) {
  *      Ticks all of our objects (called at every frame)
  */
 void ObjectHandler_tick() {
-    if (InputHandler_button_restart) {
+    /*if (InputHandler_button_restart) {
+        Client_tick(); // JANKJANK
         memset(players, 0, sizeof(*players) * num_players);
         memset(bullets, 0, sizeof(*bullets) * num_bullets);
         num_players = 0;
         num_bullets = 0;
         ObjectHandler_init(num_clients);
         InputHandler_button_restart = false;
-    }
+    }*/
     if (num_players == 0 && num_bullets == 0) {
         // all killed
         ObjectHandler_init(num_clients);
@@ -80,7 +81,7 @@ void ObjectHandler_tick() {
         }
         Player_update(player);
     
-        const Vector center = player->sprite.center;
+        //const Vector center = player->sprite.center;
         const float kill_zone2 = player->sprite.kill_zone2;
         //const float kill_zone2 = Vector_norm2(center); // might be too big
         const Vector player_position = player->position;
@@ -127,6 +128,15 @@ void ObjectHandler_render() {
     for (size_t i = 0; i < num_bullets; ++i) {
         Bullet_render(bullets[i]);
     }
+}
+
+void ObjectHandler_restart() {
+    memset(players, 0, sizeof(*players) * num_players);
+    memset(bullets, 0, sizeof(*bullets) * num_bullets);
+    num_players = 0;
+    num_bullets = 0;
+    ObjectHandler_init(num_clients);
+    InputHandler_button_restart = false;
 }
 
 /** ObjectHandler_new_player(x, y, server_id)

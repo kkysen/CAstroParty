@@ -92,16 +92,17 @@ void Client_tick() {
     char result[num_clients * 2]; // * 2 to be safe
     
     send_buffer = Networking_compress_inputs(InputHandler_button_turn, InputHandler_button_shoot, InputHandler_button_restart);
-    
+
     // If we've read something from the server
     if (read(server_socket, result, sizeof(result)) > 1) {
         Client_got_new_inputs = true;
-        
+
         // Fill in our unpacked list of inputs
         for (size_t i = 0; i < num_clients; i++) {
             Client_unpacked_inputs[i] = *Networking_decompress_inputs(result[i]);
             if (Client_unpacked_inputs[i].restart) {
-                InputHandler_button_restart = true;
+                //InputHandler_button_restart = true;
+                ObjectHandler_restart();
             }
         }
     } else {
@@ -112,6 +113,10 @@ void Client_tick() {
     if (send(server_socket, &send_buffer, sizeof(send_buffer), MSG_DONTWAIT) == -1) {
         printf("Send errorno %d\n", errno);
         exit(-1);
+    }
+
+    if (InputHandler_button_restart) {
+        ObjectHandler_restart(); 
     }
     
     
