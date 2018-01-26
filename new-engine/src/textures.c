@@ -12,6 +12,8 @@
 #include "vector.h"
 #include "util/sdl_colors.h"
 
+const size_t NUM_PLAYER_TEXTURES = BULLET; // next enum after last player
+
 static const char *const texture_dir = "src/textures";
 
 static const char *const texture_filenames[] = {

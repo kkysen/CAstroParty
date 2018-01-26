@@ -15,9 +15,10 @@ typedef enum {
     GREEN_PLAYER,
     PURPLE_PLAYER,
     RED_PLAYER,
-    NUM_PLAYERS,
     BULLET,
 } GameTexture;
+
+extern const size_t NUM_PLAYER_TEXTURES;
 
 typedef struct {
     const GameTexture id;

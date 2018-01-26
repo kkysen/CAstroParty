@@ -42,7 +42,7 @@ Player *Player_create(const Vector position, const int server_index) {
     Sprite *const sprite = get_sprite(next_texture, Game_renderer);
     sprite->border_color = RED;
     sprite->angle = player.angle;
-    next_texture = (next_texture + 1) % NUM_PLAYERS;
+    next_texture = (next_texture + 1) % NUM_PLAYER_TEXTURES;
     set_field_memory(player.sprite, sprite);
     
     Player *const heap_player = (Player *) malloc(sizeof(Player));
