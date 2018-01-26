@@ -85,11 +85,11 @@ void ObjectHandler_tick() {
  *      Renders all of our objects (called at every frame)
  */
 void ObjectHandler_render() {
-    for (size_t i = 0; i < num_bullets; ++i) {
+    for (size_t i = 0; i < num_players; ++i) {
         Player_render(players[i]);
     }
     
-    for (size_t i = 0; i < num_players; ++i) {
+    for (size_t i = 0; i < num_bullets; ++i) {
         Bullet_render(bullets[i]);
     }
 }
