@@ -26,7 +26,7 @@ Vector Player_direction(Player *const player) {
 Player *Player_create(const Vector position, const int server_index) {
     const Player player = {
             .position = position,
-            .velocity = {0},
+            .velocity = Vector_new(0, 0),
             .acceleration = 0.3,
             .server_index = server_index,
             .angle = 180,
