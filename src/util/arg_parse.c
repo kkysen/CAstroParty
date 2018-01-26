@@ -3,6 +3,7 @@
 //
 
 #include "arg_parse.h"
+#include "../serialize/buffer.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -65,7 +66,8 @@ ParsedArgv parse_args(const int argc, const char *const *const argv) {
 static void Option_set(Option *const option, const ParsedArg arg) {
     option->found = true;
     if (option->has_arg != NOT_REQUIRED) {
-        option->value = arg.value;
+        set_field(option->value, arg.value);
+//        option->value = arg.value;
     }
 }
 

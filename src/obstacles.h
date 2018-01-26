@@ -1,8 +1,0 @@
-//
-// Created by kkyse on 12/25/2017.
-//
-
-#ifndef CASTROPARTY_OBSTACLES_H
-#define CASTROPARTY_OBSTACLES_H
-
-#endif // CASTROPARTY_OBSTACLES_H

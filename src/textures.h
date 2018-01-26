@@ -15,14 +15,19 @@ typedef enum {
     GREEN_PLAYER,
     PURPLE_PLAYER,
     RED_PLAYER,
+    BULLET,
 } GameTexture;
+
+extern const size_t NUM_PLAYER_TEXTURES;
 
 typedef struct {
     const GameTexture id;
     SDL_Texture *const texture;
+    SDL_Color border_color;
     const int width;
     const int height;
     const Vector center;
+    float angle;
 } Sprite;
 
 const char *get_texture_name(GameTexture texture);
@@ -36,5 +41,7 @@ Sprite *get_sprite(GameTexture texture, SDL_Renderer *renderer);
 void remove_sprite(const Sprite *sprite);
 
 int destroy_all_textures_on_exit();
+
+void Sprite_draw(const Sprite *sprite, Vector position, SDL_Renderer *renderer);
 
 #endif // CASTROPARTY_TEXTURES_H

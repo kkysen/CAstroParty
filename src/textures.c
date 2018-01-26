@@ -8,8 +8,11 @@
 #include <stdbool.h>
 
 #include "util/utils.h"
-#include "util/string_utils.h"
 #include "util/sdl_utils.h"
+#include "vector.h"
+#include "util/sdl_colors.h"
+
+const size_t NUM_PLAYER_TEXTURES = BULLET; // next enum after last player
 
 static const char *const texture_dir = "src/textures";
 
@@ -18,9 +21,10 @@ static const char *const texture_filenames[] = {
         "green.png",
         "purple.png",
         "red.png",
+        "bullet.png",
 };
 
-static Sprite sprites[arraylen(texture_filenames)] = {0};
+static Sprite sprites[arraylen(texture_filenames)] = {};
 
 const char *get_texture_name(const GameTexture texture) {
     return texture_filenames[texture];
@@ -44,7 +48,7 @@ void remove_texture(const GameTexture texture_index) {
 }
 
 Sprite *get_sprite(GameTexture texture_index, SDL_Renderer *renderer) {
-    assert(texture_index < arraylen(sprites));
+    assert((size_t) texture_index < arraylen(sprites));
     if (sprites[texture_index].texture) {
         return sprites + texture_index;
     }
@@ -65,9 +69,11 @@ Sprite *get_sprite(GameTexture texture_index, SDL_Renderer *renderer) {
     const Sprite sprite = {
             .id = texture_index,
             .texture = texture,
+            .border_color = BLACK,
             .width = width,
             .height = height,
             .center = Vector_new(width * 0.5f, height * 0.5f),
+            .angle = 0,
     };
     memcpy(sprites + texture_index, &sprite, sizeof(Sprite));
     return sprites + texture_index;
@@ -98,4 +104,27 @@ int destroy_all_textures_on_exit() {
         will_destroy_all_textures_on_exit = true;
     }
     return 0;
+}
+
+void Sprite_draw(const Sprite *const sprite, const Vector position, SDL_Renderer *const renderer) {
+    const Vector sprite_center = sprite->center;
+    const SDL_Rect dest_rect = {
+            .x = (int) (position.x - sprite_center.x),
+            .y = (int) (position.y - sprite_center.y),
+            .w = (int) sprite_center.x,
+            .h = (int) sprite_center.y,
+    };
+    
+    sdl_warn_perror(SDL_RenderCopyEx(
+            renderer,
+            sprite->texture,
+            NULL,
+            &dest_rect,
+            sprite->angle,
+            NULL,
+            SDL_FLIP_NONE
+    ));
+    
+    SDL_SetRenderDrawColor(renderer, rgba_args(sprite->border_color));
+    SDL_RenderDrawRect(renderer, &dest_rect);
 }

@@ -1,303 +1,231 @@
-//
-// Created by kkyse on 12/24/2017.
-//
+/** game.c
+ *     The main game file, containing main and the central game loop
+ */
 
 #include "game.h"
+#include "object_handler.h"
+#include "input_handler.h"
+#include "client_handler.h"
+#include "server_handler.h"
+#include "textures.h"
+#include "util/stacktrace.h"
 
-#include <pthread.h>
+void Game_start();
 
-#include "util/sdl_colors.h"
-#include "util/sdl_utils.h"
-#include "util/hash.h"
+void Game_sdl_init();
 
-static int Game_init_renderer(Game *game);
+void Game_loop();
 
-static int Game_init_window(Game *game);
+void Game_tick();
 
-static int Game_init_window_and_renderer(Game *game);
+void Game_render();
 
-static void GameState_free(GameState *state);
+int Game_running = 0;
+SDL_Event Game_sdl_event;
 
-static void Game_loop(Game *game);
+char *Game_client_ip;
 
-static void GameState_update(GameState *state, float delta_time);
+uint64_t game_tick = 0;
 
-static void GameState_render(const GameState *state, SDL_Renderer *renderer);
+const Vector window_size = Vector_new(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-static uint64_t GameState_hash(const GameState *state);
-
-static void _GameInterruptor_pause(Game *game);
-
-static void _GameInterruptor_quit(Game *game);
-
-// =============================================
-
-Game *Game_new(const bool render) {
-    Game *const game = (Game *) malloc(sizeof(Game));
-    if (!game) {
-        perror("malloc(sizeof(Game))");
-        return NULL;
+/* void Game_sdl_init()
+ *  Init sdl elements (window and renderer)
+ */
+void Game_sdl_init() {
+    
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        printf("SDL Init failed! You're kinda screwed now\n");
+        exit(1);
     }
-    if (Game_init(
-            game, render, GAME_TITLE,
-            WINDOW_WIDTH, WINDOW_HEIGHT, GAME_FPS,
-            GAME_DEFAULT_NUM_PLAYERS) == -1) {
-        sdl_perror("Game_init(game, render, GAME_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, GAME_FPS, GAME_DEFAULT_NUM_PLAYERS)");
-        free(game);
-        return NULL;
-    }
-    return game;
-}
-
-static int Game_init_renderer(Game *const game) {
-    game->renderer = SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    sdl_check_null_perror_msg(game->renderer,
-                              "SDL_CreateRenderer(game->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)");
-    return 0;
-}
-
-static int Game_init_window(Game *const game) {
-    game->window = SDL_CreateWindow(
-            game->title,
+    
+    Game_window = SDL_CreateWindow(
+            GAME_TITLE,
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
-            game->state.width,
-            game->state.height,
-            SDL_WINDOW_OPENGL
+            WINDOW_WIDTH,
+            WINDOW_HEIGHT,
+            SDL_WINDOW_OPENGL//SDL_WINDOW_BORDERLESS//0 //SDL_WINDOW_INPUT_GRABBED
     );
-    sdl_check_null_perror_msg(game->window,
-                              "SDL_CreateWindow( game->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, game->width, game->height, SDL_WINDOW_OPENGL)");
-    
-    return 0;
-}
-
-static int Game_init_window_and_renderer(Game *const game) {
-    sdl_check_perror(Game_init_window(game));
-    if (Game_init_renderer(game) == -1) {
-        SDL_DestroyWindow(game->window);
-        sdl_perror("Game_init_renderer(game)");
-        return -1;
+    if (Game_window == NULL) {
+        printf("SDL Window failed to create. Have fun\n");
+        exit(1);
     }
-    return 0;
+    
+    Game_renderer = SDL_CreateRenderer(
+            Game_window,
+            -1,
+            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+    );
+    if (Game_renderer == NULL) {
+        SDL_DestroyWindow(Game_window);
+        printf("SDL Renderer failed to create. Good luck working with an empty window\n");
+        SDL_Quit();
+        exit(1);
+    }
 }
 
-int Game_init(Game *const game, const bool render, const char *const title,
-              const int width, const int height, const uint8_t fps, const uint8_t max_num_players) {
-    // Game.render is const, so memcpy
-    memcpy((bool *) &game->render, &render, sizeof(bool));
+/* void Game_start()
+ *  Starts the game: Initializes everything, then runs the main loop
+ */
+void Game_start(enum NetworkMode network_mode) {
     
-    game->title = str_copy(title);
+    Game_network_mode = network_mode;
     
-    game->prev_time = 0;
-    game->interrupt = NULL;
-    game->is_running = false;
-    game->quit = false;
     
-    Players *const players = (Players *) malloc(sizeof(Players));
-    check_null_msg(players, "malloc(sizeof(Players))");
+    if (Game_network_mode == NETWORK_MODE_SERVER) {
+        Server_init(2);
+        Server_accept_connections();
+    } else {
+        // Graphics and local objects
+        Game_sdl_init();
+        ObjectHandler_init();
+        InputHandler_init();
+        
+        // Connect to our server!
+        Client_init(Game_client_ip);
+    }
     
-    players->max_num_players = max_num_players;
-    players->num_players = 0;
-    players->players = NULL;
+    printf("Starting game loop\n");
+    Game_running = 1;
+    Game_loop();
+}
+
+/* void Game_loop()
+ *  Main Game loop, calling every other loop
+ */
+void Game_loop() {
+    unsigned int now_time;
+    unsigned int prev_time = SDL_GetTicks();
+    unsigned int delta_time;
     
-    const GameState state = {
-            ._x = 0,
-            ._y = 0,
-            .width = width,
-            .height = height,
-            .size = Vector_new(width, height),
-            .players = players,
-    };
-    memcpy(&game->state, &state, sizeof(GameState));
+    int should_render = 0;
     
-    // must write these after memcpy of GameState overwrites them
-    game->fps = fps;
-    game->tick = 0;
+    unsigned int ms_per_frame = 1000 / GAME_FPS;
     
-    if (game->render) {
-        if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-            sdl_perror("SDL_Init(SDL_INIT_EVERYTHING)");
-            if (str_contains(SDL_GetError(), "No available video device")) {
-                sdl_log_func(stderr, SDL_GetNumVideoDrivers(), 1);
-                sdl_log_func(stderr, SDL_GetNumVideoDisplays(), 1);
-            }
-            return -1;
+    int tick_count = 0;
+    
+    while (Game_running) {
+        should_render = 0;
+        
+        now_time = SDL_GetTicks();
+        
+        delta_time = now_time - prev_time;
+        while (delta_time > ms_per_frame) {
+            delta_time -= ms_per_frame;
+            should_render = 1;
+            
+            Game_tick();
+            tick_count++;
+            
+            prev_time = now_time;
         }
         
-        if (Game_init_window_and_renderer(game) == -1) {
-            sdl_perror("Game_init_window_and_renderer(game)");
-            SDL_Quit();
-            free(game->state.players);
-            return -1;
+        if (Game_network_mode == NETWORK_MODE_CLIENT && should_render) {
+            Game_render();
+        }
+    }
+}
+
+/* void Game_tick()
+ *  Main Game tick event, called once per frame.
+ *  Handles all game logic for all objects and keyboard input
+ */
+void Game_tick() {
+    
+    // If we're the server, we're literally not simulating anything
+    if (Game_network_mode == NETWORK_MODE_SERVER) {
+        Server_tick();
+        return;
+    } else {
+        Client_tick();
+    }
+    
+    // Handle SDL Events (keyboard input and window closing)
+    while (SDL_PollEvent(&Game_sdl_event)) {
+        switch (Game_sdl_event.type) {
+            // Grab window events
+            case SDL_WINDOWEVENT:
+                switch (Game_sdl_event.window.event) {
+                    case SDL_WINDOWEVENT_CLOSE:
+                        Game_stop();
+                        exit(0);
+                        break;
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                printf("Button down");
+                InputHandler_press_button(Game_sdl_event.button.button);
+                break;
+            case SDL_MOUSEBUTTONUP:
+                printf("Button up");
+                InputHandler_release_button(Game_sdl_event.button.button);
+                break;
         }
     }
     
-    return 0;
+    game_tick++;
+    ObjectHandler_tick();
+    
+    // InputHandler_tick() MUST be called after the object tick
+    //InputHandler_tick(); 
 }
 
-static void GameState_free(GameState *const state) {
-    Players_free(state->players);
-    free(state->players);
+/* void Game_render()
+ *  Main game render event, called once per frame.
+ *  Handles all drawing and rendering in our game
+ */
+void Game_render() {
+    SDL_SetRenderDrawColor(
+            Game_renderer,
+            0,
+            0,
+            0,
+            255);
+    SDL_RenderClear(Game_renderer);
+    
+    ObjectHandler_render();
+    
+    SDL_RenderPresent(Game_renderer);
 }
 
-// TODO must also signal to other games on network
-void Game_destroy(Game *const game) {
-    GameState_free(&game->state);
-    const uint8_t fps = game->fps;
-    const uint64_t tick = game->tick;
-    // will overwrite unionized fps and tick, so must restore these fields
-    // b/c fps and tick might be useful after game ended
-    const GameState state = {0};
-    memcpy(&game->state, &state, sizeof(GameState));
-    game->fps = fps;
-    game->tick = tick;
+/* void Game_stop()
+ *  Stops the game
+ */
+void Game_stop() {
+    Game_running = 0;
     
-    if (game->render) {
-        SDL_DestroyRenderer(game->renderer);
-        game->renderer = NULL;
-    
-        SDL_DestroyWindow(game->window);
-        game->window = NULL;
-    
+    if (Game_network_mode == NETWORK_MODE_SERVER) {
+        Server_quit();
+    } else {
+        Client_quit();
+        SDL_DestroyRenderer(Game_renderer);
+        SDL_DestroyWindow(Game_window);
         SDL_Quit();
     }
     
-    game->quit = true;
-    game->is_running = false;
-    
-    game->interrupt = NULL;
-    
-    free((char *) game->title);
-    game->title = NULL;
 }
 
-int Game_add_player(const Game *const game, Player *const player) {
-//    player->sprite = *get_sprite(player->sprite.id, game->renderer);
-    memcpy(&player->sprite, get_sprite(player->sprite.id, game->renderer), sizeof(Sprite));
-    check_perror(Players_add(game->state.players, player));
-    printf("%s's sprite: %s (%dx%d)\n",
-           player->name,
-           get_texture_name(player->sprite.id),
-           player->sprite.width,
-           player->sprite.height);
-    // TODO if (!game->render) don't load texture, but still want texture size
+// Leave arguments blank for client
+// add argument "-s" for server
+int main(int argc, char **argv) {
+    set_stack_trace_signal_handler();
+    destroy_all_textures_on_exit();
+    
+    if (argc == 1) {
+        printf("Starting client game\n");
+        Game_client_ip = "127.0.0.1";
+        Game_start(NETWORK_MODE_CLIENT);
+    } else {
+        if (strcmp(argv[1], "-s") == 0) {
+            printf("Starting server game\n");
+            Game_start(NETWORK_MODE_SERVER);
+        } else {
+            Game_client_ip = argv[1];
+            Game_start(NETWORK_MODE_CLIENT);
+        }
+    }
+    Game_stop();
+    
     return 0;
-}
-
-void Game_run(Game *const game) {
-    game->is_running = true;
-    game->prev_time = SDL_GetPerformanceCounter();
-    
-    for (;;) {
-        if (game->interrupt) {
-            // allow for other threads to set an interrupt function
-            // that can pause (is_running = false), quit, or etc. the game
-            game->interrupt(game);
-        }
-        if (game->quit) {
-            printf("Quitting Game \"%s\"\n", game->title);
-            Game_destroy(game);
-            return;
-        }
-        Game_loop(game);
-    }
-}
-
-static void Game_loop(Game *const game) {
-    game->tick++;
-    
-    // apparently V-Sync already restricts FPS to an optimal rate for the computer
-    const uint64_t current_time = SDL_GetPerformanceCounter();
-    GameState *const state = &game->state;
-    SDL_Renderer *const renderer = game->renderer;
-    if (game->is_running) {
-        const uint64_t delta_ticks = current_time - game->prev_time;
-        const float delta_time = (delta_ticks * 1000.0f) / SDL_GetPerformanceFrequency();
-        GameState_update(state, delta_time);
-        if (game->render) {
-            GameState_render(state, renderer);
-        }
-    }
-    game->prev_time = current_time;
-}
-
-static void GameState_update(GameState *const state, const float delta_time) {
-    // this should only be updated once here
-    Players_update(state->players, state, delta_time);
-}
-
-static void GameState_render(const GameState *const state, SDL_Renderer *const renderer) {
-    SDL_SetRenderDrawColor(renderer, rgba_args(BLACK));
-    SDL_RenderClear(renderer);
-    
-    Players_render(state->players, state, renderer);
-    
-    SDL_RenderPresent(renderer);
-}
-
-#define _hash(val) hash(current_hash, (double) (val))
-
-static uint64_t GameState_hash(const GameState *const state) {
-    uint64_t current_hash = PRIME_64;
-    _hash(state->tick);
-    _hash(state->width);
-    _hash(state->height);
-    _hash(Player_hash((const Player *) state->players));
-    return current_hash;
-}
-
-uint64_t Game_hash(const Game *const game) {
-    uint64_t current_hash = PRIME_64;
-    _hash(game->is_running);
-    _hash(game->fps);
-    _hash(fnv1a_64_hash(game->title));
-    _hash(GameState_hash(&game->state));
-    return current_hash;
-}
-
-#undef _hash
-
-static void _GameInterruptor_pause(Game *const game) {
-    game->is_running = false;
-}
-
-const GameInterruptor GameInterruptor_pause = _GameInterruptor_pause;
-
-void Game_pause(Game *const game) {
-    game->interrupt = GameInterruptor_pause;
-}
-
-static void _GameInterruptor_quit(Game *const game) {
-    game->quit = true;
-}
-
-const GameInterruptor GameInterruptor_quit = _GameInterruptor_quit;
-
-void Game_quit(Game *const game) {
-    game->interrupt = GameInterruptor_quit;
-}
-
-typedef struct {
-    Game *const game;
-    const double seconds;
-} TimedGame;
-
-static void *_Game_quit_later(void *arg) {
-    const TimedGame *const timed_game = (TimedGame *) arg;
-    printf("Will quit Game \"%s\" in %f seconds\n", timed_game->game->title, timed_game->seconds);
-    double_sleep(timed_game->seconds);
-    Game_quit(timed_game->game);
-    free((void *) timed_game);
-    return NULL;
-}
-
-void Game_quit_later(Game *const game, const double seconds) {
-    const TimedGame timed_game = {.game = game, .seconds = seconds};
-    TimedGame *const timed_game_ptr = (TimedGame *) malloc(sizeof(TimedGame));
-    memcpy(timed_game_ptr, &timed_game, sizeof(TimedGame));
-    
-    pthread_t thid;
-    if (pthread_create(&thid, NULL, _Game_quit_later, (void *) timed_game_ptr) != 0) {
-        perror("pthread_create(&thid, NULL, _Game_quit_later, (void *) &timed_game)");
-    }
 }
