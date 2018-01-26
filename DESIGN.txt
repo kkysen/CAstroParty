@@ -30,9 +30,9 @@ which is written by the networking process and read by the game process.
 Networking to allow for remote multiplayer.
 
 Project Roles:
-Adris: SDL
+Adris: Networking Framework
 Jawadul: Server and Lobby Interactions
-Khyber: Networking and Game Loop
+Khyber: SDL and Game Loop
 
 Data Structures:
 Custom unions and structs for management of in-game objects
@@ -45,11 +45,12 @@ A caching Map<enum, Sprite> struct that lazily loads and caches Sprites and the 
 
 Algorithms:
 A game loop that runs at 60 FPS and updates and renders all game objects each frame.
-    This game loop will update only on the server,
-    while updating and rendering on the client.
+    This game loop will update on each client,
     Only validated user input changes will be sent across the network to minimize network latency.
-Hashing of the entire game object tree for the server to validate the client game state
-    to ensure that no illegal moves were made.
-Serialization of all necessary game objects to send them over the network.
+The server receives the inputs of each client and sends them
+to every other client so that each client can simulate the
+game.
 
 Timeline:
+
+

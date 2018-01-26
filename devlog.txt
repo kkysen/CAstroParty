@@ -167,3 +167,35 @@ Wrote Game_server_main(), which is a main() function for the server,
     which takes command line arguments for the
     port, title, fps, width, height, and max num players.
 
+
+adrisJ -- 2018-01-12
+Write SDL Example of creating a window that can be drawn in
+
+adrisJ -- 2018-01-14
+Write basic game example with Game loop and Game tick/render event.
+
+adrisJ -- 2018-01-17
+Write GameObject example where game can hold, render and update multiple game objects
+
+adrisJ -- 2018-01-20
+Test very basic networking across a server and multiple clients
+
+adrisJ -- 2018-01-23
+Revamped networking system: Created protocols for sending data between
+the client and the server, wrote "client_handler.c" and "server_handler.c",
+tested and verified that networking is possible between two different clients
+on a local machine
+Protocol involves giving each client and "id" that the server defines when
+a client connects. This "id" is given to each player object, which then gets
+its inputs based on its "id". This is also how the client identifies its own
+player
+
+adrisJ -- 2018-01-24
+Made networking function with command line arguments
+Implemented networking for updated player objects
+
+adrisJ -- 2018-01-25
+Incorporate networking for bullets and incorporate bullets into the ObjectHandler
+(so bullets can be spawned)
+
+
