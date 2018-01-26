@@ -84,7 +84,7 @@ void Player_update(Player *player) {
         Vector_i_scale(bullet_position, 64);
         Vector_i_add(bullet_position, player->position);
         // pass player_index
-        Bullet *const bullet = ObjectHandler_new_bullet(bullet_position, player->angle, player->server_index);
+        ObjectHandler_new_bullet(bullet_position, player->angle, player->server_index);
     }
     
     player->button_shoot_prev = player->button_shoot;
