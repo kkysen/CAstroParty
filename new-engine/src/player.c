@@ -8,6 +8,7 @@
 #include "util/sdl_utils.h"
 #include "bullet.h"
 #include "serialize/buffer.h"
+#include "object_handler.h"
 
 #define PLAYER_MAX_SPEED 4
 
@@ -78,7 +79,7 @@ void Player_update(Player *player) {
         Vector bullet_position = Player_direction(player);
         Vector_i_scale(bullet_position, 64);
         Vector_i_add(bullet_position, player->position);
-        Bullet_create(bullet_position, player->angle);
+        ObjectHandler_new_bullet(bullet_position, player->angle);
     }
     
     player->button_shoot_prev = player->button_shoot;
