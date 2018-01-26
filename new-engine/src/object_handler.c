@@ -11,6 +11,7 @@
 #include "input_handler.h"
 #include "player.h"
 #include "bullet.h"
+#include "textures.h"
 
 #define MAX_NUM_PLAYERS 1000
 #define MAX_NUM_BULLETS 6400
@@ -44,6 +45,20 @@ void ObjectHandler_tick() {
             player->button_shoot = InputHandler_button_shoot;
         }
         Player_update(player);
+    
+        const Vector center = player->sprite.center;
+        const float kill_zone2 = Vector_norm2(center);
+        const Vector player_position = player->position;
+        for (size_t j = 0; j < num_bullets; ++j) {
+            const Vector bullet_position = bullets[j]->position;
+            if (Vector_in_radius2(player_position, bullet_position, kill_zone2)) {
+                // kill player and bullet
+                player->alive = false;
+                bullets[j]->timer = BULLET_TIMER_TIMEOUT;
+                break;
+            }
+        }
+        
         if (!player->alive) {
             free(player);
             // move last player to this spot

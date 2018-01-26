@@ -52,7 +52,9 @@ float Vector_dist2(Vector vector1, Vector vector2);
 
 #define Vector_dist(vector1, vector2) sqrtf(Vector_dist2(vector1, vector2))
 
-#define Vector_in_radius(vector1, vector2, radius) Vector_dist(vector1, vector2) < (radius) * (radius)
+#define Vector_in_radius2(vector1, vector2, radius2) Vector_dist2(vector1, vector2) < radius2
+
+#define Vector_in_radius(vector1, vector2, radius) Vector_in_radius2(vector1, vector2, (radius) * (radius))
 
 #define Vector_as_SDL_Point(vector) ((SDL_Point) {.x = (vector).x, .y = (vector).y})
 
