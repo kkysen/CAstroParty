@@ -166,7 +166,7 @@ void Game_tick() {
     ObjectHandler_tick();
     
     // InputHandler_tick() MUST be called after the object tick
-    //InputHandler_tick(); 
+    //InputHandler_tick();
 }
 
 /* void Game_render()

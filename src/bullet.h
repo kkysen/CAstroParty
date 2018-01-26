@@ -1,10 +1,10 @@
 
+#ifndef D_BULLET
+#define D_BULLET
+
 #include <SDL2/SDL.h>
 #include "vector.h"
 #include "textures.h"
-
-#ifndef D_BULLET
-#define D_BULLET
 
 // Number of frames before a bullet gets deleted
 #define BULLET_TIMER_TIMEOUT 180
@@ -28,10 +28,12 @@ typedef struct {
     int timer; // Timer, increasing each frame
     
     const Sprite sprite;
+    
+    const size_t player_server_index;
 } Bullet;
 
 
-Bullet *Bullet_create(Vector position, float angle);
+Bullet *Bullet_create(Vector position, float angle, size_t player_server_index);
 
 void Bullet_update(Bullet *bullet);
 

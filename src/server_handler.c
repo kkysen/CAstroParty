@@ -9,13 +9,13 @@
 
 #include "server_handler.h"
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<fcntl.h>
-#include<sys/socket.h>
-#include<netdb.h>
-#include<errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <errno.h>
 
 static int server_socket;
 static int *client_sockets; // List of clients

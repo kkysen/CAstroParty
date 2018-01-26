@@ -17,6 +17,6 @@ void ObjectHandler_restart();
 // Game Object creation functions
 Player *ObjectHandler_new_player(Vector position, size_t server_id);
 
-Bullet *ObjectHandler_new_bullet(Vector position, float angle);
+Bullet *ObjectHandler_new_bullet(Vector position, float angle, size_t player_server_index);
 
 #endif

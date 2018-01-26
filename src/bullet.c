@@ -11,13 +11,14 @@
  *      Creates a new bullet object but does NOT add it to our game yet.
  *      Use Handler_new_bullet(x,y)
  */
-Bullet *Bullet_create(const Vector position, const float angle) {
+Bullet *Bullet_create(const Vector position, const float angle, const size_t player_server_index) {
     const Vector direction = Vector_direction(angle);
     const Bullet bullet = {
             .position = position,
             .velocity = Vector_scale(direction, 8.0f),
             .timer = 0,
             .sprite = {},
+            .player_server_index = player_server_index,
     };
     Sprite *const sprite = get_sprite(BULLET, Game_renderer);
     sprite->border_color = YELLOW;

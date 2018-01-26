@@ -4,13 +4,93 @@ project(CAstroParty C)
 set(CMAKE_C_STANDARD 11)
 
 set(SOURCE_FILES
-#        src/main.c
-        src/player.h
-        src/vector.h
-        src/vector.c
-        src/player.c
+        #        src/main.c
+        old/src/player.h
+        old/src/vector.h
+        old/src/vector.c
+        old/src/player.c
+        old/src/game.c
+        old/src/game.h
+        old/src/util/sdl_colors.c
+        old/src/util/sdl_colors.h
+        old/src/util/sdl_utils.c
+        old/src/util/sdl_utils.h
+        old/src/util/hash.c
+        old/src/util/hash.h
+        old/src/util/io.c
+        old/src/util/io.h
+        old/src/util/random.c
+        old/src/util/random.h
+        old/src/util/sigaction.c
+        old/src/util/sigaction.h
+        old/src/util/sized_string.c
+        old/src/util/sized_string.h
+        old/src/util/stacktrace.c
+        old/src/util/stacktrace.h
+        old/src/util/string_builder.c
+        old/src/util/string_builder.h
+        old/src/util/string_utils.c
+        old/src/util/string_utils.h
+        old/src/util/utils.c
+        old/src/util/utils.h
+        old/src/players.c
+        old/src/players.h
+        old/src/bullet.c
+        old/src/bullet.h
+        old/src/bullets.c
+        old/src/bullets.h
+        old/src/obstacle.c
+        old/src/obstacle.h
+        old/src/obstacles.c
+        old/src/obstacles.h
+        old/src/textures.c
+        old/src/textures.h
+        old/src/client.c
+        old/src/client.h
+        old/src/reaction.c
+        old/src/reaction.h
+        old/src/game_packet.c
+        old/src/game_packet.h
+        old/src/networking.c
+        old/src/networking.h
+        old/src/game2.c
+        old/src/game2.h
+        old/src/game_client_connect.c
+        old/src/game_client_connect.h
+        old/src/serialize/game_serialization.c
+        old/src/serialize/game_serialization.h
+        old/src/serialize/serialization.c
+        old/src/serialize/serialization.h
+        old/src/serialize/player_serialization.c
+        old/src/serialize/player_serialization.h
+        old/src/serialize/players_serialization.c
+        old/src/serialize/players_serialization.h
+        old/src/serialize/buffer.c
+        old/src/serialize/buffer.h
+        old/src/serialize/game_state_serialization.c
+        old/src/serialize/game_state_serialization.h
+        old/src/client_init_input.c
+        old/src/client_init_input.h
+        old/src/game_server_init.c
+        old/src/game_server_init.h
+        old/src/util/arg_parse.c
+        old/src/util/arg_parse.h
+        src/client_handler.c
+        src/client_handler.h
         src/game.c
         src/game.h
+        src/input_handler.c
+        src/input_handler.h
+        src/networking.c
+        src/networking.h
+        src/object_handler.c
+        src/object_handler.h
+        src/player.c
+        src/player.h
+        src/server_handler.c
+        src/server_handler.h
+        src/textures.c
+        src/textures.h
         src/util/sdl_colors.c
         src/util/sdl_colors.h
         src/util/sdl_utils.c
@@ -25,105 +105,24 @@ set(SOURCE_FILES
         src/util/sigaction.h
         src/util/sized_string.c
         src/util/sized_string.h
-        src/util/stacktrace.c
-        src/util/stacktrace.h
         src/util/string_builder.c
         src/util/string_builder.h
         src/util/string_utils.c
         src/util/string_utils.h
         src/util/utils.c
         src/util/utils.h
-        src/players.c
-        src/players.h
-        src/bullet.c
-        src/bullet.h
-        src/bullets.c
-        src/bullets.h
-        src/obstacle.c
-        src/obstacle.h
-        src/obstacles.c
-        src/obstacles.h
-        src/textures.c
-        src/textures.h
-        src/client.c
-        src/client.h
-        src/reaction.c
-        src/reaction.h
-        src/game_packet.c
-        src/game_packet.h
-        src/networking.c
-        src/networking.h
-        src/game2.c
-        src/game2.h
-        src/game_client_connect.c
-        src/game_client_connect.h
-        src/serialize/game_serialization.c
-        src/serialize/game_serialization.h
-        src/serialize/serialization.c
-        src/serialize/serialization.h
-        src/serialize/player_serialization.c
-        src/serialize/player_serialization.h
-        src/serialize/players_serialization.c
-        src/serialize/players_serialization.h
-        src/serialize/buffer.c
-        src/serialize/buffer.h
-        src/serialize/game_state_serialization.c
-        src/serialize/game_state_serialization.h
-        src/client_init_input.c
-        src/client_init_input.h
-        src/game_server_init.c
-        src/game_server_init.h
         src/util/arg_parse.c
         src/util/arg_parse.h
-        new-engine/legacy/networking.c
-        new-engine/src/client_handler.c
-        new-engine/src/client_handler.h
-        new-engine/src/game.c
-        new-engine/src/game.h
-        new-engine/src/input_handler.c
-        new-engine/src/input_handler.h
-        new-engine/src/networking.c
-        new-engine/src/networking.h
-        new-engine/src/object_handler.c
-        new-engine/src/object_handler.h
-        new-engine/src/player.c
-        new-engine/src/player.h
-        new-engine/src/server_handler.c
-        new-engine/src/server_handler.h
-        new-engine/src/textures.c
-        new-engine/src/textures.h
-        new-engine/src/util/sdl_colors.c
-        new-engine/src/util/sdl_colors.h
-        new-engine/src/util/sdl_utils.c
-        new-engine/src/util/sdl_utils.h
-        new-engine/src/util/hash.c
-        new-engine/src/util/hash.h
-        new-engine/src/util/io.c
-        new-engine/src/util/io.h
-        new-engine/src/util/random.c
-        new-engine/src/util/random.h
-        new-engine/src/util/sigaction.c
-        new-engine/src/util/sigaction.h
-        new-engine/src/util/sized_string.c
-        new-engine/src/util/sized_string.h
-        new-engine/src/util/string_builder.c
-        new-engine/src/util/string_builder.h
-        new-engine/src/util/string_utils.c
-        new-engine/src/util/string_utils.h
-        new-engine/src/util/utils.c
-        new-engine/src/util/utils.h
-        new-engine/src/util/arg_parse.c
-        new-engine/src/util/arg_parse.h
-        new-engine/src/serialize/buffer.c
-        new-engine/src/serialize/buffer.h
-        new-engine/src/serialize/serialization.c
-        new-engine/src/serialize/serialization.h
-        new-engine/src/vector.c
-        new-engine/src/vector.h
-        new-engine/src/bullet.c
-        new-engine/src/bullet.h
-        new-engine/src/util/stacktrace.c
-        new-engine/src/util/stacktrace.h
+        src/serialize/buffer.c
+        src/serialize/buffer.h
+        src/serialize/serialization.c
+        src/serialize/serialization.h
+        src/vector.c
+        src/vector.h
+        src/bullet.c
+        src/bullet.h
+        src/util/stacktrace.c
+        src/util/stacktrace.h
         )
 
 add_executable(CAstroParty ${SOURCE_FILES})

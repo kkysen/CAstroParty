@@ -86,6 +86,10 @@ void ObjectHandler_tick() {
         //const float kill_zone2 = Vector_norm2(center); // might be too big
         const Vector player_position = player->position;
         for (size_t j = 0; j < num_bullets; ++j) {
+            if (bullets[j]->player_server_index == player->server_index) {
+                continue;
+            }
+
             const Vector bullet_position = bullets[j]->position;
             if (Vector_in_radius2(player_position, bullet_position, kill_zone2)) {
                 // kill player and bullet
@@ -94,7 +98,7 @@ void ObjectHandler_tick() {
                 break;
             }
         }
-        
+
         if (!player->alive) {
             free(player);
             // move last player to this spot
@@ -158,13 +162,13 @@ Player *ObjectHandler_new_player(const Vector position, const size_t server_id) 
  *      Creates a new bullet object AND adds it to our game.
  *      Use this to make new bullets
  */
-Bullet *ObjectHandler_new_bullet(const Vector position, const float angle) {
+Bullet *ObjectHandler_new_bullet(const Vector position, const float angle, const size_t player_server_index) {
     if (num_bullets == MAX_NUM_BULLETS) {
         printf("ERROR: Cannot create new bullet! Exceeded maximum player buffer size\n");
         return NULL;
     }
     
-    Bullet *const bullet = Bullet_create(position, angle);
+    Bullet *const bullet = Bullet_create(position, angle, player_server_index);
     bullets[num_bullets++] = bullet;
     return bullet;
 }
