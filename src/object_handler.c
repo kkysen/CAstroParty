@@ -25,6 +25,9 @@ static Bullet *bullets[MAX_NUM_BULLETS] = {0};
 static size_t num_players = 0;
 static size_t num_bullets = 0;
 
+int you_win_timer; // After all other players die, there's a "you win" timer
+#define YOU_WIN_TIME 60
+
 /** ObjectHandler_init()
  *      Initialize every starting object in the game here
  *      as well as any handler variables
@@ -50,6 +53,8 @@ void ObjectHandler_init(const size_t num_clients) {
     for (; i < num_clients; ++i) {
         ObjectHandler_new_player(Vector_random(min_border, max_border), i);
     }
+
+    you_win_timer = 0;
 }
 
 /** ObjectHandler_tick()
@@ -65,6 +70,15 @@ void ObjectHandler_tick() {
         ObjectHandler_init(num_clients);
         InputHandler_button_restart = false;
     }*/
+
+    if (num_players == 1) {
+        if (you_win_timer > YOU_WIN_TIME) {
+            InputHandler_button_restart = true;
+            you_win_timer = -99999; // uhhhhhh
+        }
+        you_win_timer++;
+    }
+
     if (num_players == 0 && num_bullets == 0) {
         // all killed
         ObjectHandler_init(num_clients);

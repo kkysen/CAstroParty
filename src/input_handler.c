@@ -45,8 +45,8 @@ void InputHandler_press_button(Uint8 button) {
         case INPUT_BUTTON_SHOOT:
             InputHandler_button_shoot = true;
             break;
-        case INPUT_BUTTON_RESTART:
-            InputHandler_button_restart = true;
+        //case INPUT_BUTTON_RESTART:
+        //    InputHandler_button_restart = true;
     }
 }
 
@@ -62,8 +62,8 @@ void InputHandler_release_button(Uint8 button) {
         case INPUT_BUTTON_SHOOT:
             InputHandler_button_shoot = false;
             break;
-        case INPUT_BUTTON_RESTART:
-            InputHandler_button_restart = false;
+        //case INPUT_BUTTON_RESTART:
+        //    InputHandler_button_restart = false;
     }
 }
 
