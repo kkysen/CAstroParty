@@ -100,6 +100,9 @@ void Client_tick() {
         // Fill in our unpacked list of inputs
         for (size_t i = 0; i < num_clients; i++) {
             Client_unpacked_inputs[i] = *Networking_decompress_inputs(result[i]);
+            if (Client_unpacked_inputs[i].restart) {
+                InputHandler_button_restart = true;
+            }
         }
     } else {
         Client_got_new_inputs = false;

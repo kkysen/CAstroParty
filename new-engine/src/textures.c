@@ -67,7 +67,7 @@ Sprite *get_sprite(GameTexture texture_index, SDL_Renderer *renderer) {
         sdl_perror("SDL_QueryTexture(texture, NULL, NULL, &width, &height) < 0");
     }
     const Vector center = Vector_new(width * 0.5f, height * 0.5f);
-    const float kill_zone = 0.5f * (Vector_norm(center) + fminf(center.x, center.y))
+    const float kill_zone = 0.5f * (Vector_norm(center) + fminf(center.x, center.y));
     const Sprite sprite = {
             .id = texture_index,
             .texture = texture,

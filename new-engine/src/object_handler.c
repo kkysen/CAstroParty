@@ -62,6 +62,11 @@ void ObjectHandler_tick() {
         num_players = 0;
         num_bullets = 0;
         ObjectHandler_init(num_clients);
+        InputHandler_button_restart = false;
+    }
+    if (num_players == 0 && num_bullets == 0) {
+        // all killed
+        ObjectHandler_init(num_clients);
     }
     
     for (size_t i = 0; i < num_players; ++i) {
