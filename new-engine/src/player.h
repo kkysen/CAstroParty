@@ -36,6 +36,8 @@ typedef struct {
     bool button_shoot_prev;
     
     const Sprite sprite;
+    
+    bool alive;
 } Player;
 
 Player *Player_create(Vector position, int server_index);

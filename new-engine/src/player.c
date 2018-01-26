@@ -35,6 +35,7 @@ Player *Player_create(const Vector position, const int server_index) {
             .button_shoot = false,
             .button_shoot_prev = false,
             .sprite = {},
+            .alive = true,
     };
     const Sprite *const sprite = get_sprite(next_texture, Game_renderer);
     next_texture = (next_texture + 1) % NUM_PLAYERS;

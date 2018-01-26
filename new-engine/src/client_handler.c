@@ -1,11 +1,12 @@
 
 #include "client_handler.h"
+
+#include <errno.h>
+
 #include "object_handler.h"
 #include "input_handler.h"
 #include "server_handler.h"
 
-#include <errno.h>
-#include <sys/errno.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -24,7 +25,17 @@ void Client_init(const char *const server_ip) {
     
     // Init client
     printf("Creating client...\n");
-    Client_server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    
+    struct addrinfo hints = {
+            .ai_family = AF_UNSPEC,
+            .ai_socktype = SOCK_STREAM,
+            .ai_flags = AI_PASSIVE,
+    };
+    
+    struct addrinfo *results;
+    getaddrinfo(server_ip, SERVER_PORT, &hints, &results);
+    
+    Client_server_socket = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
     
     /*if (setsockopt(Client_server_socket, SOL_SOCKET, SO_REUSEADDR, &(int) { 1 }, sizeof(int)) < 0) {
         printf("setsockopt failed\n");
@@ -35,15 +46,6 @@ void Client_init(const char *const server_ip) {
         printf("socket creation err\n");
         exit(-1);
     }
-    
-    struct addrinfo *hints, *results;
-    
-    hints = (struct addrinfo *) calloc(1, sizeof(struct addrinfo));
-    hints->ai_family = AF_UNSPEC; // IPv4 or IPv6
-    hints->ai_socktype = SOCK_STREAM; // To be changed to datagram later
-    hints->ai_flags = AI_PASSIVE; // Server only
-    
-    getaddrinfo(server_ip, SERVER_PORT, hints, &results);
     
     // Connect to server
     printf("Connecting to server...\n");
